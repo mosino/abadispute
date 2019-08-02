@@ -1,5 +1,5 @@
 {
-  "name": "abajs",
+  "name": "abadispute",
   "version": "1.0.0",
   "description": "Implementation of Francesca Toni's X-dispute derivation for ABA frameworks",
   "main": "index.js",
