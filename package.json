@@ -1,0 +1,11 @@
+{
+  "name": "abajs",
+  "version": "1.0.0",
+  "description": "Implementation of Francesca Toni's X-dispute derivation for ABA frameworks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Moritz Sinowatz",
+  "license": "MIT"
+}
