@@ -11,5 +11,8 @@
     "url": "git+ssh://git@bitbucket.org/msinus/abadispute.git"
   },
   "author": "Moritz Sinowatz",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "immutable": "^4.0.0-rc.12"
+  }
 }

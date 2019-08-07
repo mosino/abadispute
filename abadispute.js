@@ -1,5 +1,8 @@
+const { Map } = require('immutable');
+
 abadispute = (framework, sentence) => {
     var computationCounter = 0;
+    var branches = Map({});
 
     return {
         compute: (n) => {
@@ -7,10 +10,14 @@ abadispute = (framework, sentence) => {
                 console.log("computationCounter: " + computationCounter);
                 computationCounter++;
             }
+
+            if (branches.size == 0) {
+                branches = branches.set(0, "first branch");
+            }
         },
 
         getBranches: () => {
-            return framework + "|" + sentence + ": the branches";
+            return branches;
         },
 
         getSupport: (branch) => {
