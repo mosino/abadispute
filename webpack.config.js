@@ -5,6 +5,18 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'abadispute.js',
-        library: 'abadispute'
+        library: 'abadispute',
+        libraryTarget: 'var'
+    },
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /(node_modules)/,
+                use: {
+                    loader: "babel-loader"
+                }
+            }
+        ]
     }
 };
