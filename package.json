@@ -2,18 +2,14 @@
   "name": "abadispute",
   "version": "1.0.0",
   "description": "Implementation of Francesca Toni's X-dispute derivation for ABA frameworks",
-  "main": "dist/abadispute.js",
+  "main": "abadispute.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack --watch --mode=development"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/msinus/abadispute.git"
   },
   "author": "Moritz Sinowatz",
-  "license": "MIT",
-  "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "babel-loader": "^8.0.6",
-    "webpack": "^4.39.1",
-    "webpack-cli": "^3.3.6"
-  }
+  "license": "MIT"
 }
