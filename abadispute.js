@@ -1,4 +1,4 @@
-const { Map } = require('immutable');
+const { Map, Set } = require('immutable');
 
 module.exports = {
     abadispute: (filters, updt, implementation) => 
@@ -33,24 +33,24 @@ module.exports = {
     },
 
     filtersAB: {
-        fDbyC: (R, C) => true, // @todo
-        fDbyD: (R, D) => R,
-        fCbyD: (s, D) => true, // @todo
-        fCbyC: (R, C) => false
+        fDbyC: (R, C) => Set.intersect(R, C).size == 0,
+        fDbyD: (R, D) => R.subtract(D),
+        fCbyD: (s, D) => !D.contains(s),
+        fCbyC: (R, C) => Set.intersect(R, C).size != 0,
     },
     
     filtersGB: {
-        fDbyC: (R, C) => true, // @todo
-        fDbyD: (R, D) => R, // @todo
-        fCbyD: (s, D) => true, // @todo
+        fDbyC: (R, C) => Set.intersect(R, C).size == 0,
+        fDbyD: (R, D) => R,
+        fCbyD: (s, D) => !D.contains(s),
         fCbyC: (R, C) => false
     },
     
     filtersIB: {
-        fDbyC: (R, C) => true, // @todo
-        fDbyD: (R, D) => R, // @todo
-        fCbyD: (s, D) => true, // @todo
-        fCbyC: (R, C) => false // @todo
+        fDbyC: (R, C) => this.filtersAB(R, C),
+        fDbyD: (R, D) => R.subtract(D),
+        fCbyD: (s, D) => !D.contains(s),
+        fCbyC: (R, C) => Set.intersect(R, C).size != 0,
     },
     
     updtSimple: (f, s) => f,
