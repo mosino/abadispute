@@ -53,10 +53,10 @@ module.exports = {
         fCbyC: (R, C) => Set.intersect(R, C).size != 0,
     },
     
-    updtSimple: (f, s) => f,
+    updtSimple: (F, S) => F,
     
-    updtIB: (f, s) => {
-        return f; // @todo
+    updtIB: (F, S) => {
+        return Set.union(F, S);
     }, 
     
     implementationSimple: {
