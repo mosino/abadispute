@@ -3,8 +3,8 @@ const { Map, Set } = require('immutable');
 module.exports = {
     abadispute: (filters, updt, implementation) => 
         (framework, sentence) => {
-            var computationCounter = 0;
-            var branches = Map({});
+            let computationCounter = 0;
+            let branches = Map({});
 
             return {
                 compute: (n) => {
@@ -60,15 +60,22 @@ module.exports = {
     }, 
     
     implementationSimple: {
-        sel: (S) => S.last(), // @todo
-        turn: (P, O, F) => P.last(), // @todo
+        sel: (S) => S.first(null),
+        turn: (P, O, F) => {
+            if (P.size != 0) return "P";
+            if (O.size != 0) return "O";
+            if (F.size != 0) return "F";
+            console.log("no valid turn");
+            return null;
+        },
         memberO: (SS) => SS.first(),
         memberF: (SS) => SS.first()
     }, 
     
     implementationLP: {
-        sel: (S) => S.last(), // @todo
-        turn: (P, O, F) => P.last(), // @todo
+        // S::orderedSet
+        sel: (S) => S.last(null),
+        turn: (P, O, F) => null, // @todo: the most recently modified element among P and O
         memberO: (SS) => SS.first(),
         memberF: (SS) => SS.first()
     }
