@@ -1,8 +1,8 @@
 const { Map } = require('immutable');
 
 module.exports = {
-    abadispute: (framework, sentence) => 
-        (filters, updt, implementation) => {
+    abadispute: (filters, updt, implementation) => 
+        (framework, sentence) => {
             var computationCounter = 0;
             var branches = Map({});
 
