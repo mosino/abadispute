@@ -1,4 +1,6 @@
-# abadispute
+# ABAdispute
+
+## Usage
 
 ```javascript
 import * from 'immutable';
@@ -71,3 +73,59 @@ console.log(dispute1.getDerivation(2)); // [{P: ..., O: ..., D: ..., C: ..., F: 
 console.log(dispute1.getDerivation(4)); // [{P: ..., O: ..., D: ..., C: ..., F: ...},...,{P: ..., O: ..., D: ['a', 'b'], C: ..., F: ...}]
 ```
 
+## Data Structure:
+
+```javascript
+// t::Tuple
+let t = {
+    P: [], // Set
+    O: [[]], // Set of Sets
+    D: [], // Set
+    C: [], // Set
+    F: [], // Set
+    step: 0, // Int
+    children: [{}] // Set of Tuples
+    aborted: false // Bool
+    success: false // Bool
+}
+
+leaves = [t0, t1, t2] // Set of leaves
+```
+
+## Algorithm
+
+```javascript
+compute = (n, t) => {
+    if (n > t.step && !t.get('aborted') && !t.get('success')) {
+        if (t.get('children').size == 0) {
+            t = algorithmStep(t);
+        }
+        
+        t.set(
+            'children', 
+            t.get('children').map(
+                (tChild) => compute(n, tChild)
+            )
+        );
+    }
+
+    return t;
+}
+
+algorithmStep(t) {
+
+    //...
+
+    t.set(
+        'children', 
+        t.get('children').map(
+            (tChild) => 
+                tChild
+                    .set('step', t.step + 1)
+                    .set('children', Set([]))
+        );
+
+    return t;
+}
+
+```
