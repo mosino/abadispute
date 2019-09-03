@@ -77,19 +77,17 @@ console.log(dispute1.getDerivation(4)); // [{P: ..., O: ..., D: ..., C: ..., F: 
 
 ```javascript
 // t::Tuple
-let t = {
-    P: [], // Set
-    O: [[]], // Set of Sets
-    D: [], // Set
-    C: [], // Set
-    F: [], // Set
+let t0 = {
+    P: Set([]), // Set
+    O: Set([]), // Set of Sets
+    D: Set([]), // Set
+    C: Set([]), // Set
+    F: Set([]), // Set
     step: 0, // Int
-    children: [{}] // Set of Tuples
+    children: Set([]) // Set of Tuples
     aborted: false // Bool
     success: false // Bool
 }
-
-leaves = [t0, t1, t2] // Set of leaves
 ```
 
 ## Algorithm
@@ -104,7 +102,7 @@ compute = (n, t) => {
         t.set(
             'children', 
             t.get('children').map(
-                (tChild) => compute(n, tChild)
+                tChild => compute(n, tChild)
             )
         );
     }
@@ -112,17 +110,25 @@ compute = (n, t) => {
     return t;
 }
 
-algorithmStep(t) {
+algorithmStep = t => {
+    let success = false; //@todo
+    let aborted = false; //@todo
 
+    if (success) t = t.set('success', true);
+    if (aborted) t = t.set('aborted', true);
+    if (success || aborted) return t;
+    
     //...
 
     t.set(
         'children', 
         t.get('children').map(
-            (tChild) => 
+            tChild => 
                 tChild
                     .set('step', t.step + 1)
                     .set('children', Set([]))
+                    .set('aborted', false)
+                    .set('success', false)
         );
 
     return t;
