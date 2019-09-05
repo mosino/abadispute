@@ -86,17 +86,37 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
         let sigma = i.sel(fGetUnmarked(S));
 
         if (A.includes(sigma)) {    // 2.i
-            //  2.i.a
+            // 2.i.a
             let tChildA = fTConstructor()
                 .set('O', O.delete(S).add(fMark(S, sigma)))
                 .set('P', P)
                 .set('D', D)
                 .set('C', C)
                 .set('F', F);
+            
+            t.set('children', t.get('children').add(tChildA));
 
-            //  2.i.b
-
-            //  2.i.c
+            if (f.fCbyD(sigma, D)) {
+                if (f.fCbyC(Set([sigma]), C)) {   // 2.i.b
+                    let tChildB = fTConstructor()
+                        .set('O', O.delete(S))
+                        .set('F', updt(F, fUnmarkAll(S)))
+                        .set('P', P)
+                        .set('D', D)
+                        .set('C', C);
+                        
+                    t.set('children', t.get('children').add(tChildB));
+                } else {    // 2.i.c
+                    let tChildC = fTConstructor()
+                        .set('O', O.delete(S))
+                        .set('C', C.add(sigma))
+                        .set('D', D.union(A.intersect(Set([not(sigma)]))))
+                        .set('F', updt(F, fUnmarkAll(S)))
+                        .set('P', P.add(not(sigma)));
+                    
+                    t.set('children', t.get('children').add(tChildC));
+                }
+            }
         } else {    // 2.ii
 
         }
@@ -127,12 +147,13 @@ const fArgumentConstructor = sentence =>
         m: Set()    // marked sentences
     });
 
-const fGetSentences = argument => argument.get('s');
-
+// S_u
 const fGetUnmarked = argument => argument.get('s').subtract(argument.get('m'));
 
+// m(sigma, S)
 const fMark = (argument, sentence) => argument.set('m', argument.get('m').add(sentence));
 
+// u(S)
 const fUnmarkAll = argument => argument.set('m', Set());
 
 const fTConstructor = () =>
