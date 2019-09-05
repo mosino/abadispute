@@ -19,7 +19,7 @@ fCompute = (filters, updt, implementation, framework, t) => n => {
 }
 
 // as described in X-dispute-derivations
-fAlgorithmStep = (f, u, i, fw, t) => {
+fAlgorithmStep = (f, updt, i, fw, t) => {
     let success = false; //@todo
     let aborted = false; //@todo
 
@@ -63,9 +63,9 @@ fAlgorithmStep = (f, u, i, fw, t) => {
 
                         ruleExists = true;
 
-                        if (i.fDbyC(body, C)) {
+                        if (f.fDbyC(body, C)) {
                             let tChild = fTConstructor()
-                                .set('P', P.delete(sigma).union(i.fDbyD(body, D)))
+                                .set('P', P.delete(sigma).union(f.fDbyD(body, D)))
                                 .set('D', D.union(A.intersect(body)))
                                 .set('C', C)
                                 .set('O', O)
