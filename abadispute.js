@@ -1,15 +1,16 @@
 const { Map, Set } = require('immutable');
 
-fCompute = (filters, updt, implementation, t) => n => {
+// recursive call
+fCompute = (filters, updt, implementation, framework, t) => n => {
     if (n > t.step && !t.get('aborted') && !t.get('success')) {
         if (t.get('children').size == 0) {
-            t = fAlgorithmStep(filters, updt, implementation, t);
+            t = fAlgorithmStep(filters, updt, implementation, framework, t);
         }
         
         t.set(
             'children', 
             t.get('children').map(
-                tChild => fCompute(filters, updt, implementation, tChild)(n)
+                tChild => fCompute(filters, updt, implementation, framework, tChild)(n)
             )
         );
     }
@@ -17,15 +18,59 @@ fCompute = (filters, updt, implementation, t) => n => {
     return t;
 }
 
-fAlgorithmStep = (filters, updt, implementation, t) => {
+// as described in X-dispute-derivations
+fAlgorithmStep = (f, u, i, fw, t) => {
     let success = false; //@todo
     let aborted = false; //@todo
 
     if (success) t = t.set('success', true);
     if (aborted) t = t.set('aborted', true);
     if (success || aborted) return t;
+
+    let P = t.get('P');
+    let O = t.get('O');
+    let D = t.get('D');
+    let C = t.get('C');
+    let F = t.get('F');
+    let A = Set(fw.get('assumptions'));
+    let R = Set(fw.get('rules'));
+    // not::function - allow for functional or list of contraries
+    let not = typeof(fw.get('contraries') == 'function') ?
+        fw.get('contraries') :
+        (a => fw.get('contraries')[a]);
     
-    //...
+    // 1
+    if (i.turn(P, O, F) == 'P') {
+        let sigma = t.sel(P);
+
+        if (A.includes(sigma)) { // 1.i
+            let tChild = fTConstructor()
+                .set('P', P.delete(sigma))
+                .set('O', O.add(not(sigma)))
+                .set('D', D)
+                .set('C', C)
+                .set('F', F);
+
+            t.set('children', Set([tChild]));
+        } else { // 1.ii
+            R.map(
+                rule => {
+                    if (rule.head == sigma) {
+                        let body = Set(rule.b);
+
+                        if (i.fDbyC(body, C)) {
+                            let tChild = fTConstructor()
+                                .set('P', P.delete(sigma).union(i.fDbyD(body, D)))
+                                .set('D', D.union(A.intersect(body)))
+                                .set('C', C)
+                                .set('O', O)
+                                .set('F', F)
+                        }
+                    }
+                }
+            );
+        }
+    }
 
     t.set(
         'children', 
@@ -42,11 +87,11 @@ fAlgorithmStep = (filters, updt, implementation, t) => {
     return t;
 }
 
-fGetInitialT = (framework, sentence) => 
+fTConstructor = () => {
     Map({
-        P: Set([sentence]),
+        P: Set(),
         O: Set(), // Set of Sets
-        D: Set(framework.assumptions).intersect(Set([sentence])),
+        D: Set(),
         C: Set(),
         F: Set(),
         step: 0,
@@ -55,7 +100,14 @@ fGetInitialT = (framework, sentence) =>
         success: false,
         path: List()
     });
+}
 
+fGetInitialT = (framework, sentence) =>
+    fTConstructor()
+        .set('P', Set([sentence]))
+        .set('D', Set(framework.assumptions).intersect(Set([sentence])));
+
+// traverse computation tree and return leaves
 fGetBranches = tList => {
     let branches = List();
 
@@ -72,6 +124,7 @@ fGetBranches = tList => {
     return branches;
 }
 
+// list of all tuples along path in the computation tree
 fGetDerivation = (t, path, partialDerivation) => 
     (path.size == 0) ?
         partialDerivation.add(t) :
@@ -90,7 +143,7 @@ module.exports = {
             let getPath = branch => getBranches().get(branch).get('path');
 
             return {
-                compute: fCompute(filters, updt, implementation, t),
+                compute: fCompute(filters, updt, implementation, framework, t),
                 getBranches: fGetBranches(List([t])),
                 getSupport: branch => getBranches().get(branch).get('D'),
                 getDerivation: branch => 
@@ -132,10 +185,10 @@ module.exports = {
     implementationSimple: {
         sel: (S) => S.first(null),
         turn: (P, O, F) => {
-            if (P.size != 0) return "P";
-            if (O.size != 0) return "O";
-            if (F.size != 0) return "F";
-            console.log("no valid turn");
+            if (P.size != 0) return 'P';
+            if (O.size != 0) return 'O';
+            if (F.size != 0) return 'F';
+            console.log('no valid turn');
             return null;
         },
         memberO: (SS) => SS.first(),
