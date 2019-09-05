@@ -1,15 +1,15 @@
-const { Map, Set, fromJS } = require('immutable');
+const { Map, Set } = require('immutable');
 
-fCompute = t => n => {
+fCompute = (filters, updt, implementation, t) => n => {
     if (n > t.step && !t.get('aborted') && !t.get('success')) {
         if (t.get('children').size == 0) {
-            t = fAlgorithmStep(t);
+            t = fAlgorithmStep(filters, updt, implementation, t);
         }
         
         t.set(
             'children', 
             t.get('children').map(
-                tChild => fCompute(n, tChild)
+                tChild => fCompute(filters, updt, implementation, tChild)(n)
             )
         );
     }
@@ -17,7 +17,7 @@ fCompute = t => n => {
     return t;
 }
 
-fAlgorithmStep = t => {
+fAlgorithmStep = (filters, updt, implementation, t) => {
     let success = false; //@todo
     let aborted = false; //@todo
 
@@ -36,16 +36,17 @@ fAlgorithmStep = t => {
                     .set('children', Set([]))
                     .set('aborted', false)
                     .set('success', false)
-        );
+        )
+    );
 
     return t;
 }
 
 fGetInitialT = (framework, sentence) => 
     Map({
-        P: Set(),
+        P: Set([sentence]),
         O: Set(), // Set of Sets
-        D: Set(),
+        D: Set(framework.assumptions).intersect(Set([sentence])),
         C: Set(),
         F: Set(),
         step: 0,
@@ -89,7 +90,7 @@ module.exports = {
             let getPath = branch => getBranches().get(branch).get('path');
 
             return {
-                compute: fCompute(t),
+                compute: fCompute(filters, updt, implementation, t),
                 getBranches: fGetBranches(List([t])),
                 getSupport: branch => getBranches().get(branch).get('D'),
                 getDerivation: branch => 
