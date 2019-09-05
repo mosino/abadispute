@@ -39,8 +39,8 @@ fAlgorithmStep = (f, u, i, fw, t) => {
         fw.get('contraries') :
         (a => fw.get('contraries')[a]);
     
-    // 1
-    if (i.turn(P, O, F) == 'P') {
+
+    if (i.turn(P, O, F) == 'P') { // 1
         let sigma = t.sel(P);
 
         if (A.includes(sigma)) { // 1.i
@@ -53,10 +53,14 @@ fAlgorithmStep = (f, u, i, fw, t) => {
 
             t.set('children', Set([tChild]));
         } else { // 1.ii
+            let ruleExists = false;
+
             R.map(
                 rule => {
                     if (rule.head == sigma) {
                         let body = Set(rule.b);
+
+                        ruleExists = true;
 
                         if (i.fDbyC(body, C)) {
                             let tChild = fTConstructor()
@@ -65,10 +69,16 @@ fAlgorithmStep = (f, u, i, fw, t) => {
                                 .set('C', C)
                                 .set('O', O)
                                 .set('F', F)
+
+                            t.set('children', t.get('children').add(tChild));
                         }
                     }
                 }
             );
+
+            if (!ruleExists) {
+                t.set('aborted', true);
+            }
         }
     }
 
