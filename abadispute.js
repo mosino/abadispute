@@ -20,8 +20,8 @@ fCompute = (filters, updt, implementation, framework, t) => n => {
 
 // as described in X-dispute-derivations
 fAlgorithmStep = (f, updt, i, fw, t) => {
-    let success = false; //@todo
-    let aborted = false; //@todo
+    let success = false;    //@todo
+    let aborted = false;    //@todo
 
     if (success) t = t.set('success', true);
     if (aborted) t = t.set('aborted', true);
@@ -41,19 +41,19 @@ fAlgorithmStep = (f, updt, i, fw, t) => {
         (a => fw.get('contraries')[a]);
     
 
-    if (turn == 'P') { // 1
-        let sigma = t.sel(P);
+    if (turn == 'P') {  // 1
+        let sigma = i.sel(P);
 
-        if (A.includes(sigma)) { // 1.i
+        if (A.includes(sigma)) {    // 1.i
             let tChild = fTConstructor()
                 .set('P', P.delete(sigma))
-                .set('O', O.add(not(sigma)))
+                .set('O', O.add(argumentConstructor(sigma))
                 .set('D', D)
                 .set('C', C)
                 .set('F', F);
 
             t.set('children', Set([tChild]));
-        } else { // 1.ii
+        } else {    // 1.ii
             let ruleExists = false;
 
             R.map(
@@ -81,9 +81,10 @@ fAlgorithmStep = (f, updt, i, fw, t) => {
                 t.set('aborted', true);
             }
         }
-    } else if(turn == 'O') { // 2
-
-    } else if(turn == 'F') { // 3
+    } else if(turn == 'O') {    // 2
+        let S = i.memberO(O);
+        let sigma = i.sel(Su);
+    } else if(turn == 'F') {    // 3
         // @todo
     } else {
         console.error('"turn" returned an unexpected value');
@@ -104,20 +105,33 @@ fAlgorithmStep = (f, updt, i, fw, t) => {
     return t;
 }
 
-fTConstructor = () => {
+fArgumentConstructor = sentence => 
+    Map({
+        s: Set([sentence]),
+        m: Set()    // marked sentences
+    })
+
+fGetSentences = argument => argument.get('s');
+
+fGetUnmarked = argument => argument.get('s').subtract(argument.get('m'));
+
+fMark = (argument, sentence) => argument.set('m', argument.get('m').add(sentence));
+
+fUnmarkAll = argument => argument.set('m', Set());
+
+fTConstructor = () =>
     Map({
         P: Set(),
-        O: Set(), // Set of Sets
+        O: Set(),   // Set of Arguments
         D: Set(),
         C: Set(),
         F: Set(),
         step: 0,
-        children: Set(), // Set of Tuples
+        children: Set(),    // Set of Tuples
         aborted: false,
         success: false,
         path: List()
     });
-}
 
 fGetInitialT = (framework, sentence) =>
     fTConstructor()
@@ -216,7 +230,7 @@ module.exports = {
     implementationLP: {
         // S::orderedSet
         sel: (S) => S.last(null),
-        turn: (P, O, F) => null, // @todo: the most recently modified element among P and O
+        turn: (P, O, F) => null,    // @todo: the most recently modified element among P and O
         memberO: (SS) => SS.first(),
         memberF: (SS) => SS.first()
     }
