@@ -16,7 +16,7 @@ const fCompute = (filters, updt, implementation, framework, t) => n => {
     }
 
     return t;
-}
+};
 
 // as described in X-dispute-derivations
 const fAlgorithmStep = (f, updt, i, fw, t) => {
@@ -69,7 +69,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                                 .set('D', D.union(A.intersect(body)))
                                 .set('C', C)
                                 .set('O', O)
-                                .set('F', F)
+                                .set('F', F);
 
                             t.set('children', t.get('children').add(tChild));
                         }
@@ -83,7 +83,23 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
         }
     } else if(turn == 'O') {    // 2
         let S = i.memberO(O);
-        let sigma = i.sel(Su);
+        let sigma = i.sel(fGetUnmarked(S));
+
+        if (A.includes(sigma)) {    // 2.i
+            //  2.i.a
+            let tChildA = fTConstructor()
+                .set('O', O.delete(S).add(fMark(S, sigma)))
+                .set('P', P)
+                .set('D', D)
+                .set('C', C)
+                .set('F', F);
+
+            //  2.i.b
+
+            //  2.i.c
+        } else {    // 2.ii
+
+        }
     } else if(turn == 'F') {    // 3
         // @todo
     } else {
@@ -103,13 +119,13 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
     );
 
     return t;
-}
+};
 
 const fArgumentConstructor = sentence => 
     Map({
         s: Set([sentence]),
         m: Set()    // marked sentences
-    })
+    });
 
 const fGetSentences = argument => argument.get('s');
 
@@ -153,7 +169,7 @@ const fGetBranches = tList => {
     );
 
     return branches;
-}
+};
 
 // list of all tuples along path in the computation tree
 const fGetDerivation = (t, path, partialDerivation) => 
@@ -183,7 +199,7 @@ module.exports = {
                         getPath(branch),
                         List()
                     )
-            }
+            };
     },
 
     filtersAB: {
@@ -235,4 +251,4 @@ module.exports = {
         memberO: (SS) => SS.first(),
         memberF: (SS) => SS.first()
     }
-}
+};
