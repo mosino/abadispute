@@ -1,7 +1,7 @@
-const { Map, Set } = require('immutable');
+const { Map, Set, List } = require('immutable');
 
 // recursive call
-fCompute = (filters, updt, implementation, framework, t) => n => {
+const fCompute = (filters, updt, implementation, framework, t) => n => {
     if (n > t.step && !t.get('aborted') && !t.get('success')) {
         if (t.get('children').size == 0) {
             t = fAlgorithmStep(filters, updt, implementation, framework, t);
@@ -19,7 +19,7 @@ fCompute = (filters, updt, implementation, framework, t) => n => {
 }
 
 // as described in X-dispute-derivations
-fAlgorithmStep = (f, updt, i, fw, t) => {
+const fAlgorithmStep = (f, updt, i, fw, t) => {
     let success = false;    //@todo
     let aborted = false;    //@todo
 
@@ -36,7 +36,7 @@ fAlgorithmStep = (f, updt, i, fw, t) => {
     let A = Set(fw.get('assumptions'));
     let R = Set(fw.get('rules'));
     // not::function - allow for functional or list of contraries
-    let not = typeof(fw.get('contraries') == 'function') ?
+    let not = (typeof(fw.get('contraries')) == 'function') ?
         fw.get('contraries') :
         (a => fw.get('contraries')[a]);
     
@@ -47,7 +47,7 @@ fAlgorithmStep = (f, updt, i, fw, t) => {
         if (A.includes(sigma)) {    // 1.i
             let tChild = fTConstructor()
                 .set('P', P.delete(sigma))
-                .set('O', O.add(argumentConstructor(sigma))
+                .set('O', O.add(fArgumentConstructor(not(sigma))))
                 .set('D', D)
                 .set('C', C)
                 .set('F', F);
@@ -105,21 +105,21 @@ fAlgorithmStep = (f, updt, i, fw, t) => {
     return t;
 }
 
-fArgumentConstructor = sentence => 
+const fArgumentConstructor = sentence => 
     Map({
         s: Set([sentence]),
         m: Set()    // marked sentences
     })
 
-fGetSentences = argument => argument.get('s');
+const fGetSentences = argument => argument.get('s');
 
-fGetUnmarked = argument => argument.get('s').subtract(argument.get('m'));
+const fGetUnmarked = argument => argument.get('s').subtract(argument.get('m'));
 
-fMark = (argument, sentence) => argument.set('m', argument.get('m').add(sentence));
+const fMark = (argument, sentence) => argument.set('m', argument.get('m').add(sentence));
 
-fUnmarkAll = argument => argument.set('m', Set());
+const fUnmarkAll = argument => argument.set('m', Set());
 
-fTConstructor = () =>
+const fTConstructor = () =>
     Map({
         P: Set(),
         O: Set(),   // Set of Arguments
@@ -133,18 +133,18 @@ fTConstructor = () =>
         path: List()
     });
 
-fGetInitialT = (framework, sentence) =>
+const fGetInitialT = (framework, sentence) =>
     fTConstructor()
         .set('P', Set([sentence]))
         .set('D', Set(framework.assumptions).intersect(Set([sentence])));
 
 // traverse computation tree and return leaves
-fGetBranches = tList => {
+const fGetBranches = tList => {
     let branches = List();
 
     tList.map(
         t => {
-            if (t.get('children').size = 0) {
+            if (t.get('children').size == 0) {
                 t = branches.add(t);
             } else {
                 t = branches.concat(fGetBranches(t.get('children')));
@@ -156,7 +156,7 @@ fGetBranches = tList => {
 }
 
 // list of all tuples along path in the computation tree
-fGetDerivation = (t, path, partialDerivation) => 
+const fGetDerivation = (t, path, partialDerivation) => 
     (path.size == 0) ?
         partialDerivation.add(t) :
         fGetDerivation(
@@ -195,9 +195,9 @@ module.exports = {
     
     filtersGB: {
         fDbyC: (R, C) => Set.intersect(R, C).size == 0,
-        fDbyD: (R, D) => R,
+        fDbyD: (R, _D) => R,
         fCbyD: (s, D) => !D.contains(s),
-        fCbyC: (R, C) => false
+        fCbyC: (_R, _C) => false
     },
     
     filtersIB: {
@@ -207,7 +207,7 @@ module.exports = {
         fCbyC: (R, C) => Set.intersect(R, C).size != 0,
     },
     
-    updtSimple: (F, S) => F,
+    updtSimple: (F, _S) => F,
     
     updtIB: (F, S) => {
         return Set.union(F, S);
@@ -230,6 +230,7 @@ module.exports = {
     implementationLP: {
         // S::orderedSet
         sel: (S) => S.last(null),
+        // eslint-disable-next-line
         turn: (P, O, F) => null,    // @todo: the most recently modified element among P and O
         memberO: (SS) => SS.first(),
         memberF: (SS) => SS.first()
