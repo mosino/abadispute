@@ -27,6 +27,7 @@ fAlgorithmStep = (f, u, i, fw, t) => {
     if (aborted) t = t.set('aborted', true);
     if (success || aborted) return t;
 
+    let turn = i.turn(P, O, F);
     let P = t.get('P');
     let O = t.get('O');
     let D = t.get('D');
@@ -40,7 +41,7 @@ fAlgorithmStep = (f, u, i, fw, t) => {
         (a => fw.get('contraries')[a]);
     
 
-    if (i.turn(P, O, F) == 'P') { // 1
+    if (turn == 'P') { // 1
         let sigma = t.sel(P);
 
         if (A.includes(sigma)) { // 1.i
@@ -80,6 +81,12 @@ fAlgorithmStep = (f, u, i, fw, t) => {
                 t.set('aborted', true);
             }
         }
+    } else if(turn == 'O') { // 2
+
+    } else if(turn == 'F') { // 3
+        // @todo
+    } else {
+        console.error('"turn" returned an unexpected value');
     }
 
     t.set(
@@ -198,7 +205,8 @@ module.exports = {
             if (P.size != 0) return 'P';
             if (O.size != 0) return 'O';
             if (F.size != 0) return 'F';
-            console.log('no valid turn');
+
+            console.error('no valid turn');
             return null;
         },
         memberO: (SS) => SS.first(),
