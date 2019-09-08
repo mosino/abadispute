@@ -18,7 +18,7 @@ const fCompute = (filters, updt, implementation, framework, t) => n => {
     return t;
 };
 
-// as described in X-dispute-derivations
+// X-dispute derivations
 const fAlgorithmStep = (f, updt, i, fw, t) => {
     let success = false;    //@todo
     let aborted = false;    //@todo
@@ -98,27 +98,57 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
 
             if (f.fCbyD(sigma, D)) {
                 if (f.fCbyC(Set([sigma]), C)) {   // 2.i.b
-                    let tChildB = fTConstructor()
+                    let tChild = fTConstructor()
                         .set('O', O.delete(S))
-                        .set('F', updt(F, fUnmarkAll(S)))
+                        .set('F', updt(F, S.get('s')))
                         .set('P', P)
                         .set('D', D)
                         .set('C', C);
                         
-                    t.set('children', t.get('children').add(tChildB));
+                    t.set('children', t.get('children').add(tChild));
                 } else {    // 2.i.c
-                    let tChildC = fTConstructor()
+                    let tChild = fTConstructor()
                         .set('O', O.delete(S))
                         .set('C', C.add(sigma))
                         .set('D', D.union(A.intersect(Set([not(sigma)]))))
-                        .set('F', updt(F, fUnmarkAll(S)))
+                        .set('F', updt(F, S.get('s')))
                         .set('P', P.add(not(sigma)));
                     
-                    t.set('children', t.get('children').add(tChildC));
+                    t.set('children', t.get('children').add(tChild));
                 }
             }
         } else {    // 2.ii
+            let newO = O.delete(S);
+            let updateFWith = Set();
 
+            R.map(rule => {
+                if (rule.h == sigma) {
+                    if (f.fCbyC(rule.b, C)) {
+                        updateFWith = updateFWith.add(
+                            S.get('s')
+                                .delete(sigma)
+                                .union(Set(rule.b))
+                        );
+                    } else {
+                        newO = newO.add(
+                            fArgumentAddSentences(
+                                fDeleteFromArgument(S, sigma),
+                                Set(rule.b)
+                            )
+                        );
+                    }
+                }
+            });
+
+
+            let tChild = fTConstructor()       
+                .set('O', newO)
+                .set('F', updt(F, updateFWith))
+                .set('P', P)
+                .set('D', D)
+                .set('C', C);
+            
+            t.set('children', t.get('children').add(tChild));
         }
     } else if(turn == 'F') {    // 3
         // @todo
@@ -147,14 +177,20 @@ const fArgumentConstructor = sentence =>
         m: Set()    // marked sentences
     });
 
+const fDeleteFromArgument = (argument, sentence) =>
+    Map({
+        s: argument.get('s').delete(sentence),
+        m: argument.get('m').delete(sentence)
+    });
+
+const fArgumentAddSentences = (argument, sentences) =>
+    argument.set('s', argument.get('s').union(sentences));
+
 // S_u
 const fGetUnmarked = argument => argument.get('s').subtract(argument.get('m'));
 
 // m(sigma, S)
 const fMark = (argument, sentence) => argument.set('m', argument.get('m').add(sentence));
-
-// u(S)
-const fUnmarkAll = argument => argument.set('m', Set());
 
 const fTConstructor = () =>
     Map({
