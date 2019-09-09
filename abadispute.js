@@ -20,8 +20,6 @@ const fCompute = (filters, updt, implementation, framework, t) => n => {
 
 // X-dispute derivations
 const fAlgorithmStep = (f, updt, i, fw, t) => {
-    if (t.get('success') || t.get('aborted')) return t;
-
     let P = t.get('P');
     let O = t.get('O');
     let D = t.get('D');
