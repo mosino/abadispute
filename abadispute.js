@@ -236,9 +236,9 @@ const fGetBranches = tList => {
     tList.map(
         t => {
             if (t.get('children').size == 0) {
-                t = branches.add(t);
+                branches = branches.insert(t);
             } else {
-                t = branches.concat(fGetBranches(t.get('children')));
+                branches = branches.concat(fGetBranches(t.get('children')));
             }
         }
     );
@@ -266,7 +266,7 @@ module.exports = {
 
             return {
                 compute: fCompute(filters, updt, implementation, framework, t),
-                getBranches: fGetBranches(List([t])),
+                getBranches,
                 getSupport: branch => getBranches().get(branch).get('D'),
                 getDerivation: branch => 
                     fGetDerivation(
