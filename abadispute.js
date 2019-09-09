@@ -27,7 +27,6 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
     if (aborted) t = t.set('aborted', true);
     if (success || aborted) return t;
 
-    let turn = i.turn(P, O, F);
     let P = t.get('P');
     let O = t.get('O');
     let D = t.get('D');
@@ -35,6 +34,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
     let F = t.get('F');
     let A = Set(fw.get('assumptions'));
     let R = Set(fw.get('rules'));
+    let turn = i.turn(P, O, F, t.get('recentPO'));
     // not::function - allow for functional or list of contraries
     let not = (typeof(fw.get('contraries')) == 'function') ?
         fw.get('contraries') :
@@ -50,7 +50,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('O', O.add(fArgumentConstructor(not(sigma))))
                 .set('D', D)
                 .set('C', C)
-                .set('F', F);
+                .set('F', F)
+                .set('recentPO', 'O');
 
             t.set('children', Set([tChild]));
         } else {    // 1.ii
@@ -69,7 +70,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                                 .set('D', D.union(A.intersect(body)))
                                 .set('C', C)
                                 .set('O', O)
-                                .set('F', F);
+                                .set('F', F)
+                                .set('recentPO', 'P');
 
                             t.set('children', t.get('children').add(tChild));
                         }
@@ -92,7 +94,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('P', P)
                 .set('D', D)
                 .set('C', C)
-                .set('F', F);
+                .set('F', F)
+                .set('recentPO', 'O');
             
             t.set('children', t.get('children').add(tChildA));
 
@@ -103,7 +106,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('F', updt(F, S.get('s')))
                         .set('P', P)
                         .set('D', D)
-                        .set('C', C);
+                        .set('C', C)
+                        .set('recentPO', 'O');
                         
                     t.set('children', t.get('children').add(tChild));
                 } else {    // 2.i.c
@@ -112,7 +116,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('C', C.add(sigma))
                         .set('D', D.union(A.intersect(Set([not(sigma)]))))
                         .set('F', updt(F, S.get('s')))
-                        .set('P', P.add(not(sigma)));
+                        .set('P', P.add(not(sigma)))
+                        .set('recentPO', 'P');
                     
                     t.set('children', t.get('children').add(tChild));
                 }
@@ -146,7 +151,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('F', updt(F, updateFWith))
                 .set('P', P)
                 .set('D', D)
-                .set('C', C);
+                .set('C', C)
+                .set('recentPO', 'O');
             
             t.set('children', t.get('children').add(tChild));
         }
@@ -203,7 +209,8 @@ const fTConstructor = () =>
         children: Set(),    // Set of Tuples
         aborted: false,
         success: false,
-        path: List()
+        path: List(),
+        recentPO: null
     });
 
 const fGetInitialT = (framework, sentence) =>
@@ -288,7 +295,7 @@ module.exports = {
     
     implementationSimple: {
         sel: (S) => S.first(null),
-        turn: (P, O, F) => {
+        turn: (P, O, F, _recentPO) => {
             if (P.size != 0) return 'P';
             if (O.size != 0) return 'O';
             if (F.size != 0) return 'F';
@@ -303,8 +310,14 @@ module.exports = {
     implementationLP: {
         // S::orderedSet
         sel: (S) => S.last(null),
-        // eslint-disable-next-line
-        turn: (P, O, F) => null,    // @todo: the most recently modified element among P and O
+        turn: (P, O, F, recentPO) => {
+            if (recentPO == 'P' && P.size != 0) return 'P';
+            if (recentPO == 'O' && O.size != 0) return 'P';
+            if (F.size != 0) return 'F'; // ?
+
+            console.error('no valid turn');
+            return null;
+        },
         memberO: (SS) => SS.first(),
         memberF: (SS) => SS.first()
     }
