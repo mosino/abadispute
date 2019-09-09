@@ -1,8 +1,9 @@
-const { Map, Set, List } = require('immutable');
+const { Map, Set, List, fromJS } = require('immutable');
 
 // recursive call
 const fCompute = (filters, updt, implementation, framework, t) => n => {
-    if (n > t.step && !t.get('aborted') && !t.get('success')) {
+    console.log(1);
+    if (n > t.get('step') && !t.get('aborted') && !t.get('success')) {
         if (t.get('children').size == 0) {
             t = fAlgorithmStep(filters, updt, implementation, framework, t);
         }
@@ -20,18 +21,19 @@ const fCompute = (filters, updt, implementation, framework, t) => n => {
 
 // X-dispute derivations
 const fAlgorithmStep = (f, updt, i, fw, t) => {
+    console.log(1);
     let P = t.get('P');
     let O = t.get('O');
     let D = t.get('D');
     let C = t.get('C');
     let F = t.get('F');
-    let A = Set(fw.get('assumptions'));
-    let R = Set(fw.get('rules'));
+    let A = Set(fw.assumptions);
+    let R = Set(fw.rules);
     let turn = i.turn(P, O, F, t.get('recentPO'));
     // not::function - allow for functional or list of contraries
-    let not = (typeof(fw.get('contraries')) == 'function') ?
-        fw.get('contraries') :
-        (a => fw.get('contraries')[a]);
+    let not = (typeof(fw.contraries) == 'function') ?
+        fw.contraries :
+        (a => fw.contraries[a]);
     
 
     if (turn == 'P') {  // 1
@@ -58,7 +60,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
 
             R.map(
                 rule => {
-                    if (rule.head == sigma) {
+                    if (rule.h == sigma) {
                         let body = Set(rule.b);
 
                         ruleExists = true;
