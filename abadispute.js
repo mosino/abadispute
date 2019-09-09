@@ -1,8 +1,7 @@
-const { Map, Set, List, fromJS } = require('immutable');
+const { Map, Set, List } = require('immutable');
 
 // recursive call
 const fCompute = (filters, updt, implementation, framework, t) => n => {
-    console.log(1);
     if (n > t.get('step') && !t.get('aborted') && !t.get('success')) {
         if (t.get('children').size == 0) {
             t = fAlgorithmStep(filters, updt, implementation, framework, t);
@@ -21,7 +20,6 @@ const fCompute = (filters, updt, implementation, framework, t) => n => {
 
 // X-dispute derivations
 const fAlgorithmStep = (f, updt, i, fw, t) => {
-    console.log(1);
     let P = t.get('P');
     let O = t.get('O');
     let D = t.get('D');
@@ -50,7 +48,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('C', C)
                 .set('F', F)
                 .set('recentPO', 'O')
-                .set('step', t.step + 1)
+                .set('step', t.get('step') + 1)
                 .set('aborted', false)
                 .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
 
@@ -75,11 +73,11 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                                 .set('O', O)
                                 .set('F', F)
                                 .set('recentPO', 'P')
-                                .set('step', t.step + 1)
+                                .set('step', t.get('step') + 1)
                                 .set('aborted', false)
                                 .set('success', newP.size == 0 && O.size == 0 && F.size == 0);
 
-                            t.set('children', t.get('children').add(tChild));
+                            t = t.set('children', t.get('children').add(tChild));
                         }
                     }
                 }
@@ -104,7 +102,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('C', C)
                 .set('F', F)
                 .set('recentPO', 'O')
-                .set('step', t.step + 1)
+                .set('step', t.get('step') + 1)
                 .set('aborted', false)
                 .set('success', P.size == 0 && newOA.size == 0 && F.size == 0);
             
@@ -121,7 +119,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('D', D)
                         .set('C', C)
                         .set('recentPO', 'O')
-                        .set('step', t.step + 1)
+                        .set('step', t.get('step') + 1)
                         .set('aborted', false)
                         .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
                         
@@ -137,7 +135,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('F', updt(F, S.get('s')))
                         .set('P', newP)
                         .set('recentPO', 'P')
-                        .set('step', t.step + 1)
+                        .set('step', t.get('step') + 1)
                         .set('aborted', false)
                         .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
                     
@@ -175,7 +173,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('D', D)
                 .set('C', C)
                 .set('recentPO', 'O')
-                .set('step', t.step + 1)
+                .set('step', t.get('step') + 1)
                 .set('aborted', false)
                 .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
             
@@ -280,14 +278,14 @@ module.exports = {
     },
 
     filtersAB: {
-        fDbyC: (R, C) => Set.intersect(R, C).size == 0,
+        fDbyC: (R, C) => R.intersect(C).size == 0,
         fDbyD: (R, D) => R.subtract(D),
         fCbyD: (s, D) => !D.contains(s),
-        fCbyC: (R, C) => Set.intersect(R, C).size != 0,
+        fCbyC: (R, C) => R.intersect(C).size != 0,
     },
     
     filtersGB: {
-        fDbyC: (R, C) => Set.intersect(R, C).size == 0,
+        fDbyC: (R, C) => R.intersect(C).size == 0,
         fDbyD: (R, _D) => R,
         fCbyD: (s, D) => !D.contains(s),
         fCbyC: (_R, _C) => false
@@ -297,13 +295,13 @@ module.exports = {
         fDbyC: (R, C) => this.filtersAB(R, C),
         fDbyD: (R, D) => R.subtract(D),
         fCbyD: (s, D) => !D.contains(s),
-        fCbyC: (R, C) => Set.intersect(R, C).size != 0,
+        fCbyC: (R, C) => R.intersect(C).size != 0,
     },
     
     updtSimple: (F, _S) => F,
     
     updtIB: (F, S) => {
-        return Set.union(F, S);
+        return F.union(S);
     }, 
     
     implementationSimple: {
