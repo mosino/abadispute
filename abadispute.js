@@ -20,12 +20,7 @@ const fCompute = (filters, updt, implementation, framework, t) => n => {
 
 // X-dispute derivations
 const fAlgorithmStep = (f, updt, i, fw, t) => {
-    let success = false;    //@todo
-    let aborted = false;    //@todo
-
-    if (success) t = t.set('success', true);
-    if (aborted) t = t.set('aborted', true);
-    if (success || aborted) return t;
+    if (t.get('success') || t.get('aborted')) return t;
 
     let P = t.get('P');
     let O = t.get('O');
@@ -45,13 +40,19 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
         let sigma = i.sel(P);
 
         if (A.includes(sigma)) {    // 1.i
+            let newP = P.delete(sigma);
+            let newO = O.add(fArgumentConstructor(not(sigma)));
+
             let tChild = fTConstructor()
-                .set('P', P.delete(sigma))
-                .set('O', O.add(fArgumentConstructor(not(sigma))))
+                .set('P', newP)
+                .set('O', newO)
                 .set('D', D)
                 .set('C', C)
                 .set('F', F)
-                .set('recentPO', 'O');
+                .set('recentPO', 'O')
+                .set('step', t.step + 1)
+                .set('aborted', false)
+                .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
 
             t.set('children', Set([tChild]));
         } else {    // 1.ii
@@ -65,13 +66,18 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         ruleExists = true;
 
                         if (f.fDbyC(body, C)) {
+                            let newP = P.delete(sigma).union(f.fDbyD(body, D));
+
                             let tChild = fTConstructor()
-                                .set('P', P.delete(sigma).union(f.fDbyD(body, D)))
+                                .set('P', newP)
                                 .set('D', D.union(A.intersect(body)))
                                 .set('C', C)
                                 .set('O', O)
                                 .set('F', F)
-                                .set('recentPO', 'P');
+                                .set('recentPO', 'P')
+                                .set('step', t.step + 1)
+                                .set('aborted', false)
+                                .set('success', newP.size == 0 && O.size == 0 && F.size == 0);
 
                             t.set('children', t.get('children').add(tChild));
                         }
@@ -89,35 +95,51 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
 
         if (A.includes(sigma)) {    // 2.i
             // 2.i.a
+            let newOA = O.delete(S).add(fMark(S, sigma));
+
             let tChildA = fTConstructor()
-                .set('O', O.delete(S).add(fMark(S, sigma)))
+                .set('O', newOA)
                 .set('P', P)
                 .set('D', D)
                 .set('C', C)
                 .set('F', F)
-                .set('recentPO', 'O');
+                .set('recentPO', 'O')
+                .set('step', t.step + 1)
+                .set('aborted', false)
+                .set('success', P.size == 0 && newOA.size == 0 && F.size == 0);
             
             t.set('children', t.get('children').add(tChildA));
 
             if (f.fCbyD(sigma, D)) {
                 if (f.fCbyC(Set([sigma]), C)) {   // 2.i.b
+                    let newO = O.delete(S);
+
                     let tChild = fTConstructor()
-                        .set('O', O.delete(S))
+                        .set('O', newO)
                         .set('F', updt(F, S.get('s')))
                         .set('P', P)
                         .set('D', D)
                         .set('C', C)
-                        .set('recentPO', 'O');
+                        .set('recentPO', 'O')
+                        .set('step', t.step + 1)
+                        .set('aborted', false)
+                        .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
                         
                     t.set('children', t.get('children').add(tChild));
                 } else {    // 2.i.c
+                    let newO = O.delete(S);
+                    let newP = P.add(not(sigma));
+
                     let tChild = fTConstructor()
-                        .set('O', O.delete(S))
+                        .set('O', newO)
                         .set('C', C.add(sigma))
                         .set('D', D.union(A.intersect(Set([not(sigma)]))))
                         .set('F', updt(F, S.get('s')))
-                        .set('P', P.add(not(sigma)))
-                        .set('recentPO', 'P');
+                        .set('P', newP)
+                        .set('recentPO', 'P')
+                        .set('step', t.step + 1)
+                        .set('aborted', false)
+                        .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
                     
                     t.set('children', t.get('children').add(tChild));
                 }
@@ -152,7 +174,10 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('P', P)
                 .set('D', D)
                 .set('C', C)
-                .set('recentPO', 'O');
+                .set('recentPO', 'O')
+                .set('step', t.step + 1)
+                .set('aborted', false)
+                .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
             
             t.set('children', t.get('children').add(tChild));
         }
@@ -161,18 +186,6 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
     } else {
         console.error('"turn" returned an unexpected value');
     }
-
-    t.set(
-        'children', 
-        t.get('children').map(
-            tChild => 
-                tChild
-                    .set('step', t.step + 1)
-                    .set('children', Set([]))
-                    .set('aborted', false)
-                    .set('success', false)
-        )
-    );
 
     return t;
 };
@@ -308,7 +321,7 @@ module.exports = {
     }, 
     
     implementationLP: {
-        // S::orderedSet
+        // @todo S::orderedSet
         sel: (S) => S.last(null),
         turn: (P, O, F, recentPO) => {
             if (recentPO == 'P' && P.size != 0) return 'P';
