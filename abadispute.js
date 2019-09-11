@@ -86,7 +86,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
             );
 
             if (!ruleExists) {
-                t.set('aborted', true);
+                t = t.set('aborted', true);
             }
         }
     } else if(turn == 'O') {    // 2

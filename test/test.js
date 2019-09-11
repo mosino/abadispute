@@ -292,13 +292,48 @@ describe('Algorithm', function () {
                         .set('step', 4);
 
                     let newT = fAlgorithmStep(f, u, i, fw, t);
-                    let newTExpected = fTConstructor()
+                    let newChildExpected = fTConstructor()
                         .set('P', Set(['a', 'b', 'd']))
                         .set('O', Set([argA, argB, argC, argNotC]))
                         .set('recentPO', 'O')
                         .set('step', 5);
 
-                    assert.ok(newT.get('children').first().equals(newTExpected));
+                    assert.ok(newT.get('children').first().equals(newChildExpected));
+                });
+            });
+
+            describe('sigma is not in assumptions', function () {
+                it('If there is no corresponding rule, should abort branch', function () {
+                    let fw = {
+                        rules: [
+                            {
+                                h: 'a',
+                                b: 'b'
+                            }
+                        ],
+                        assumptions: ['d'],
+                        contraries: {
+                            'c': 'd'
+                        }
+                    };
+
+                    let argA = fArgumentConstructor('a');
+                    let argB = fArgumentConstructor('b');
+                    let argC = fArgumentConstructor('c');
+
+                    let t = fTConstructor()
+                        .set('P', Set(['a', 'b', 'c', 'd']))
+                        .set('O', Set([argA, argB, argC]))
+                        .set('step', 6);
+
+                    let newT = fAlgorithmStep(f, u, i, fw, t);
+                    let newTExpected = fTConstructor()
+                        .set('P', Set(['a', 'b', 'c', 'd']))
+                        .set('O', Set([argA, argB, argC]))
+                        .set('step', 6)
+                        .set('aborted', true);
+
+                    assert.ok(newT.equals(newTExpected));
                 });
             });
         });
