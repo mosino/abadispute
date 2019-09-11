@@ -13,7 +13,7 @@ const fCompute = a.__get__('fCompute');
 const fAlgorithmStep = a.__get__('fAlgorithmStep');
 const fArgumentConstructor = a.__get__('fArgumentConstructor');
 const fDeleteFromArgument = a.__get__('fDeleteFromArgument');
-const fArgumentAddSentence = a.__get__('fArgumentAddSentence');
+const fArgumentAddSentences = a.__get__('fArgumentAddSentences');
 const fGetUnmarked = a.__get__('fGetUnmarked');
 const fMark = a.__get__('fMark');
 const fTConstructor = a.__get__('fTConstructor');
@@ -37,7 +37,7 @@ describe('Helpers', function () {
     });
 
     describe('#fDeleteFromArgument', function () {
-        it('Should remove "mySentence" from both "s" and "m"', function () {
+        it('If marked, should remove "mySentence" from both "s" and "m"', function () {
             let argument = Map({
                 s: Set(['a', 'b', 'c', 'mySentence']),
                 m: Set(['a', 'c', 'mySentence'])
@@ -55,7 +55,7 @@ describe('Helpers', function () {
     });
 
     describe('#fDeleteFromArgument', function () {
-        it('Should remove "mySentence" from "s"', function () {
+        it('If not marked, should remove "mySentence" from "s"', function () {
             let argument = Map({
                 s: Set(['a', 'b', 'c', 'mySentence']),
                 m: Set(['a', 'c'])
@@ -73,7 +73,7 @@ describe('Helpers', function () {
     });
 
     describe('#fDeleteFromArgument', function () {
-        it('Should do nothing', function () {
+        it('If not in argument, should do nothing', function () {
             let argument = Map({
                 s: Set(['a', 'b', 'c']),
                 m: Set(['a', 'c'])
@@ -90,14 +90,83 @@ describe('Helpers', function () {
         });
     });
 
-    describe('#fDeleteFromArgument', function () {
-        it('Should do nothing', function () {
+    describe('#fArgumentAddSentences', function () {
+        it('Should add "mySentence" to "s"', function () {
             let argument = Map({
                 s: Set(['a', 'b', 'c']),
                 m: Set(['a', 'c'])
             });
 
-            argument = fDeleteFromArgument(argument, 'mySentence');
+            argument = fArgumentAddSentences(argument, Set(['mySentence']));
+
+            assert.ok(argument.equals(
+                Map({
+                    s: Set(['a', 'b', 'c', 'mySentence']),
+                    m: Set(['a', 'c'])
+                })
+            ));
+        });
+    });
+
+    describe('#fArgumentAddSentences', function () {
+        it('Should add "mySentence1" and "mySentece2" to "s"', function () {
+            let argument = Map({
+                s: Set(['a', 'b', 'c']),
+                m: Set(['a', 'c'])
+            });
+
+            argument = fArgumentAddSentences(argument, Set(['mySentence1', 'mySentence2']));
+
+            assert.ok(argument.equals(
+                Map({
+                    s: Set(['a', 'b', 'c', 'mySentence1', 'mySentence2']),
+                    m: Set(['a', 'c'])
+                })
+            ));
+        });
+    });
+
+    describe('#fGetUnmarked', function () {
+        it('Should return elements in "s" that are not in "m"', function () {
+            let argument = Map({
+                s: Set(['a', 'b', 'c', 'd']),
+                m: Set(['a', 'c'])
+            });
+
+            let unmarked = fGetUnmarked(argument);
+
+            assert.ok(unmarked.equals(
+                Set(['b', 'd']),
+            ));
+        });
+    });
+
+    describe('#fMark', function () {
+        it('If in argument, shoud add "mySentence" to "m"', function () {
+            let argument = Map({
+                s: Set(['a', 'b', 'c', 'mySentence']),
+                m: Set(['a', 'c'])
+            });
+
+            argument = fMark(argument, 'mySentence');
+
+            assert.ok(argument.equals(
+                Map({
+                    s: Set(['a', 'b', 'c', 'mySentence']),
+                    m: Set(['a', 'c', 'mySentence'])
+                })
+            ));
+        });
+    });
+
+    describe('#fMark', function () {
+        it('If not in argument, shoud do nothing', function () {
+            let argument = Map({
+                s: Set(['a', 'b', 'c']),
+                m: Set(['a', 'c'])
+            });
+
+            argument = fMark(argument, 'mySentence');
 
             assert.ok(argument.equals(
                 Map({

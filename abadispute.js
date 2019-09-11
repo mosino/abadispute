@@ -207,7 +207,10 @@ const fArgumentAddSentences = (argument, sentences) =>
 const fGetUnmarked = argument => argument.get('s').subtract(argument.get('m'));
 
 // m(sigma, S)
-const fMark = (argument, sentence) => argument.set('m', argument.get('m').add(sentence));
+const fMark = (argument, sentence) => 
+    argument.get('s').includes(sentence) ?
+        argument.set('m', argument.get('m').add(sentence)) :
+        argument;
 
 const fTConstructor = () =>
     Map({
