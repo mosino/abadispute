@@ -256,13 +256,16 @@ const fGetBranches = tList => {
 };
 
 // list of all tuples along path in the computation tree
-const fGetDerivation = (t, path, partialDerivation) => 
+const fGetDerivation = (t, path, partialDerivation) =>
     (path.size == 0) ?
-        partialDerivation.add(t) :
+        partialDerivation.push(t.delete('children')) :
         fGetDerivation(
-            t.getIn('children', path.first()), 
+            t.getIn([
+                'children', 
+                path.first()
+            ]), 
             path.shift(),
-            partialDerivation.add(t)
+            partialDerivation.push(t.delete('children'))
         );
 
 module.exports = {

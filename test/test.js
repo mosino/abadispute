@@ -234,7 +234,7 @@ describe('Helpers', function () {
     });
 
     describe('#fGetDerivation', function () {
-        it('Should return a list of the leaves', function () {
+        it('Should return a list of nodes traversing the path', function () {
             let node1 = fTConstructor().set('C', Set(['1']));
             let node2 = fTConstructor().set('C', Set(['2']));
             let node3 = fTConstructor().set('C', Set(['3']));
@@ -245,14 +245,19 @@ describe('Helpers', function () {
             let node8 = fTConstructor().set('C', Set(['8']));
             let node9 = fTConstructor().set('C', Set(['9']));
 
-            node6 = node6.set('children', Set([node7]));
-            node4 = node4.set('children', Set([node5, node6]));
-            node2 = node2.set('children', Set([node3]));
-            node1 = node1.set('children', Set([node2, node4, node8, node9]));
+            node6 = node6.set('children', List([node7]));
+            node4 = node4.set('children', List([node5, node6]));
+            node2 = node2.set('children', List([node3]));
+            node1 = node1.set('children', List([node2, node4, node8, node9]));
 
             let derivation = fGetDerivation(node1, List([1, 1, 0]), List());
 
-            assert.ok(derivation.equals(List([node1, node4, node6, node7])));
+            assert.ok(derivation.equals(List([
+                node1.delete('children'), 
+                node4.delete('children'), 
+                node6.delete('children'), 
+                node7.delete('children')
+            ])));
         });
     });
 });
