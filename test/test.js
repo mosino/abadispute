@@ -259,16 +259,16 @@ describe('Helpers', function () {
 describe('Algorithm', function () {
     describe('#fAlgorithmStep', function () {
         describe('filtersGB', function () {
-            describe('turn == "P"', function () {
-                let i = a.implementationSimple;
-                let f = a.filtersGB;
-                let u = a.updtSimple;
-
-                i.turn = (_P, _O, _F, _recentPO) => 'P';
-                i.sel = (_P) => 'c';
-
-                describe('sigma is in assumptions', function () {
+            describe('turn == "P" (1)', function () {                
+                describe('sigma is in assumptions (1.i)', function () {
                     it('Should remove "c" from "P" and add "d" to "O"', function () {
+                        let f = a.filtersGB;
+                        let u = a.updtSimple;
+                        let i = a.implementationSimple;
+
+                        i.sel = (_P) => 'c';
+                        i.turn = (_P, _O, _F, _recentPO) => 'P';
+
                         let fw = {
                             rules: [
                                 {
@@ -303,8 +303,15 @@ describe('Algorithm', function () {
                     });
                 });
 
-                describe('sigma is not in assumptions', function () {
+                describe('sigma is not in assumptions (1.ii)', function () {
                     it('If there is no corresponding rule, should abort branch', function () {
+                        let f = a.filtersGB;
+                        let u = a.updtSimple;
+                        let i = a.implementationSimple;
+
+                        i.sel = (_P) => 'c';
+                        i.turn = (_P, _O, _F, _recentPO) => 'P';
+
                         let fw = {
                             rules: [
                                 {
@@ -338,6 +345,13 @@ describe('Algorithm', function () {
                     });
 
                     it('If there are corresponding rules, should add a child for each of them', function () {
+                        let f = a.filtersGB;
+                        let u = a.updtSimple;
+                        let i = a.implementationSimple;
+
+                        i.sel = (_P) => 'c';
+                        i.turn = (_P, _O, _F, _recentPO) => 'P';
+
                         let fw = {
                             rules: [
                                 {
@@ -375,6 +389,21 @@ describe('Algorithm', function () {
                         ]));
 
                         assert.ok(newT.equals(newTExpected));
+                    });
+                });
+            });
+
+            describe('turn == "O" (2)', function () {
+                describe('CbyD(sigma, D) == true and fCbyC(Set([sigma]), C) == true (2.i.b)', function () {
+                    it('should work', function () {
+                        let f = a.filtersGB;
+                        let u = a.updtSimple;
+                        let i = a.implementationSimple;
+
+                        i.sel = (_P) => 'c';
+                        i.turn = (_P, _O, _F, _recentPO) => 'O';
+
+                        assert.ok(true);
                     });
                 });
             });
