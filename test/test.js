@@ -175,7 +175,7 @@ describe('Helpers', function () {
                 rules: [
                     {
                         h: 'a',
-                        b: 's'
+                        b: ['s']
                     }
                 ],
                 assumptions: ['s'],
@@ -258,82 +258,124 @@ describe('Helpers', function () {
 
 describe('Algorithm', function () {
     describe('#fAlgorithmStep', function () {
-        describe('turn == "P"', function () {
-            let i = a.implementationSimple;
-            let f = a.filtersGB;
-            let u = a.updtSimple;
+        describe('filtersGB', function () {
+            describe('turn == "P"', function () {
+                let i = a.implementationSimple;
+                let f = a.filtersGB;
+                let u = a.updtSimple;
 
-            i.turn = (_P, _O, _F, _recentPO) => 'P';
-            i.sel = (_P) => 'c';
+                i.turn = (_P, _O, _F, _recentPO) => 'P';
+                i.sel = (_P) => 'c';
 
-            describe('sigma is in assumptions', function () {
-                it('Should remove "c" from "P" and add "d" to "O"', function () {
-                    let fw = {
-                        rules: [
-                            {
-                                h: 'a',
-                                b: 'b'
+                describe('sigma is in assumptions', function () {
+                    it('Should remove "c" from "P" and add "d" to "O"', function () {
+                        let fw = {
+                            rules: [
+                                {
+                                    h: 'a',
+                                    b: ['b']
+                                }
+                            ],
+                            assumptions: ['c'],
+                            contraries: {
+                                'c': 'd'
                             }
-                        ],
-                        assumptions: ['c'],
-                        contraries: {
-                            'c': 'd'
-                        }
-                    };
+                        };
 
-                    let argA = fArgumentConstructor('a');
-                    let argB = fArgumentConstructor('b');
-                    let argC = fArgumentConstructor('c');
-                    let argNotC = fArgumentConstructor('d');
+                        let argA = fArgumentConstructor('a');
+                        let argB = fArgumentConstructor('b');
+                        let argC = fArgumentConstructor('c');
+                        let argNotC = fArgumentConstructor('d');
 
-                    let t = fTConstructor()
-                        .set('P', Set(['a', 'b', 'c', 'd']))
-                        .set('O', Set([argA, argB, argC]))
-                        .set('step', 4);
+                        let t = fTConstructor()
+                            .set('P', Set(['a', 'b', 'c', 'd']))
+                            .set('O', Set([argA, argB, argC]))
+                            .set('step', 4);
 
-                    let newT = fAlgorithmStep(f, u, i, fw, t);
-                    let newChildExpected = fTConstructor()
-                        .set('P', Set(['a', 'b', 'd']))
-                        .set('O', Set([argA, argB, argC, argNotC]))
-                        .set('recentPO', 'O')
-                        .set('step', 5);
+                        let newT = fAlgorithmStep(f, u, i, fw, t);
+                        let newChildExpected = fTConstructor()
+                            .set('P', Set(['a', 'b', 'd']))
+                            .set('O', Set([argA, argB, argC, argNotC]))
+                            .set('recentPO', 'O')
+                            .set('step', 5);
 
-                    assert.ok(newT.get('children').first().equals(newChildExpected));
+                        assert.ok(newT.get('children').first().equals(newChildExpected));
+                    });
                 });
-            });
 
-            describe('sigma is not in assumptions', function () {
-                it('If there is no corresponding rule, should abort branch', function () {
-                    let fw = {
-                        rules: [
-                            {
-                                h: 'a',
-                                b: 'b'
+                describe('sigma is not in assumptions', function () {
+                    it('If there is no corresponding rule, should abort branch', function () {
+                        let fw = {
+                            rules: [
+                                {
+                                    h: 'a',
+                                    b: ['b']
+                                }
+                            ],
+                            assumptions: ['d'],
+                            contraries: {
+                                'd': 'c'
                             }
-                        ],
-                        assumptions: ['d'],
-                        contraries: {
-                            'c': 'd'
-                        }
-                    };
+                        };
 
-                    let argA = fArgumentConstructor('a');
-                    let argB = fArgumentConstructor('b');
-                    let argC = fArgumentConstructor('c');
+                        let argA = fArgumentConstructor('a');
+                        let argB = fArgumentConstructor('b');
+                        let argC = fArgumentConstructor('c');
 
-                    let t = fTConstructor()
-                        .set('P', Set(['a', 'b', 'c', 'd']))
-                        .set('O', Set([argA, argB, argC]))
-                        .set('step', 6);
+                        let t = fTConstructor()
+                            .set('P', Set(['a', 'b', 'c', 'd']))
+                            .set('O', Set([argA, argB, argC]))
+                            .set('step', 6);
 
-                    let newT = fAlgorithmStep(f, u, i, fw, t);
-                    let newTExpected = fTConstructor()
-                        .set('P', Set(['a', 'b', 'c', 'd']))
-                        .set('O', Set([argA, argB, argC]))
-                        .set('step', 6)
-                        .set('aborted', true);
+                        let newT = fAlgorithmStep(f, u, i, fw, t);
+                        let newTExpected = fTConstructor()
+                            .set('P', Set(['a', 'b', 'c', 'd']))
+                            .set('O', Set([argA, argB, argC]))
+                            .set('step', 6)
+                            .set('aborted', true);
 
-                    assert.ok(newT.equals(newTExpected));
+                        assert.ok(newT.equals(newTExpected));
+                    });
+
+                    it('If there are corresponding rules, should add a child for each of them', function () {
+                        let fw = {
+                            rules: [
+                                {
+                                    h: 'c',
+                                    b: ['a', 'd']
+                                },
+                                {
+                                    h: 'c',
+                                    b: ['b']
+                                }
+                            ],
+                            assumptions: ['d'],
+                            contraries: {
+                                'd': 'c'
+                            }
+                        };
+
+                        let t = fTConstructor()
+                            .set('P', Set(['x', 'c']))
+                            .set('D', Set(['y']))
+                            .set('step', 7);
+
+                        let newT = fAlgorithmStep(f, u, i, fw, t);
+                        let newTExpected = t.set('children', List([
+                            fTConstructor()
+                                .set('P', Set(['x', 'a', 'd']))
+                                .set('D', Set(['y', 'd']))
+                                .set('step', 8)
+                                .set('recentPO', 'P'),
+                            fTConstructor()
+                                .set('P', Set(['x', 'b']))
+                                .set('D', Set(['y']))
+                                .set('step', 8)
+                                .set('recentPO', 'P'),
+                        ]));
+
+                        assert.ok(newT.equals(newTExpected));
+                    });
                 });
             });
         });
