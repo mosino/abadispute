@@ -176,4 +176,60 @@ describe('Helpers', function () {
             ));
         });
     });
+
+    describe('#fGetInitialT', function () {
+        it('If "s" is in the assumptions, "P" should contain "a", "D" should contain "a"', function () {
+            let framework = {
+                rules: {
+                    h: 'a',
+                    b: 's'
+                },
+                assumptions: ['s'],
+                contraries: {
+                    's': '-s'
+                }
+            };
+
+            let t = fGetInitialT(framework, 's');
+
+            assert.ok(t.equals(
+                Map({
+                    P: Set(['s']),
+                    O: Set(),   // Set of Arguments
+                    D: Set(['s']),
+                    C: Set(),
+                    F: Set(),
+                    step: 0,
+                    children: Set(),    // Set of Tuples
+                    aborted: false,
+                    success: false,
+                    path: List(),
+                    recentPO: null
+                })
+            ));
+        });
+    });
+
+    describe('#fGetBranches', function () {
+        it('Should return a list of the leaves', function () {
+            let node1 = fTConstructor().set('C', Set(['1']));
+            let node2 = fTConstructor().set('C', Set(['2']));
+            let node3 = fTConstructor().set('C', Set(['3']));
+            let node4 = fTConstructor().set('C', Set(['4']));
+            let node5 = fTConstructor().set('C', Set(['5']));
+            let node6 = fTConstructor().set('C', Set(['6']));
+            let node7 = fTConstructor().set('C', Set(['7']));
+            let node8 = fTConstructor().set('C', Set(['8']));
+            let node9 = fTConstructor().set('C', Set(['9']));
+
+            node6 = node6.set('children', Set([node7]));
+            node4 = node4.set('children', Set([node5, node6]));
+            node2 = node2.set('children', Set([node3]));
+            node1 = node1.set('children', Set([node2, node4, node8, node9]));
+
+            let leaves = fGetBranches(List([node1]));
+
+            assert.ok(leaves.equals(List([node3, node5, node7, node8, node9])));
+        });
+    });
 });

@@ -239,9 +239,9 @@ const fGetBranches = tList => {
     tList.map(
         t => {
             if (t.get('children').size == 0) {
-                branches = branches.insert(t);
+                branches = branches.push(t);
             } else {
-                branches = branches.concat(fGetBranches(t.get('children')));
+                branches = branches.concat(fGetBranches(Set(t.get('children'))));
             }
         }
     );
