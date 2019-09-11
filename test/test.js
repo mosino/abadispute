@@ -469,20 +469,47 @@ describe('Algorithm', function () {
 
                     describe('Is a defence and no culprit (2.i.c)', function () {
                         it('Should move argument to F, expand culprits, start counter-attack in "P"', function () {
-                            let f = a.filtersGB;
-                            let u = a.updtSimple;
+                            let f = a.filtersIB;
+                            let u = a.updtIB;
                             let i = a.implementationSimple;
-
-                            let fw = {
-                                assumptions: ['c'],
-                            };
 
                             f.fCbyD = (_C, _D) => true;
                             f.fCbyC = (_C, _D) => false;
                             i.sel = (_P) => 'c';
                             i.turn = (_P, _O, _F, _recentPO) => 'O';
 
-                            assert.ok(false);
+                            let fw = {
+                                assumptions: ['c', 'notc'],
+                                contraries: {
+                                    'c': 'notc'
+                                }
+                            };
+
+                            let argA = fArgumentConstructor('a');
+                            let argB = fArgumentConstructor('b');
+                            let argC = fArgumentConstructor('c');
+                            
+                            argC = fArgumentAddSentences(argC, Set(['d']));
+
+                            let t = fTConstructor()
+                                .set('O', Set([argC, argA, argB]))
+                                .set('C', Set(['x']))
+                                .set('D', Set(['y']))
+                                .set('P', Set(['z']))
+                                .set('step', 3);
+
+                            let newT = fAlgorithmStep(f, u, i, fw, t);
+
+                            let newChildExpected = fTConstructor()
+                                .set('O', Set([argA, argB]))
+                                .set('C', Set(['x', 'c']))
+                                .set('D', Set(['y', 'notc']))
+                                .set('F', Set(['c', 'd']))
+                                .set('P', Set(['z', 'notc']))
+                                .set('step', 4)
+                                .set('recentPO', 'P');
+
+                            assert.ok(newT.get('children').get(1).equals(newChildExpected));
                         });
                     });
                 });
