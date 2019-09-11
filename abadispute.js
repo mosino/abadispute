@@ -51,8 +51,9 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
                 .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
+                // @todo path
 
-            t.set('children', Set([tChild]));
+            t.set('children', List([tChild]));
         } else {    // 1.ii
             let ruleExists = false;
 
@@ -76,8 +77,9 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                                 .set('step', t.get('step') + 1)
                                 .set('aborted', false)
                                 .set('success', newP.size == 0 && O.size == 0 && F.size == 0);
+                                // @todo path
 
-                            t = t.set('children', t.get('children').add(tChild));
+                            t = t.set('children', t.get('children').push(tChild));
                         }
                     }
                 }
@@ -105,8 +107,9 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
                 .set('success', P.size == 0 && newOA.size == 0 && F.size == 0);
+                // @todo path
             
-            t.set('children', t.get('children').add(tChildA));
+            t.set('children', t.get('children').push(tChildA));
 
             if (f.fCbyD(sigma, D)) {
                 if (f.fCbyC(Set([sigma]), C)) {   // 2.i.b
@@ -122,8 +125,9 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
                         .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
+                        // @todo path
                         
-                    t.set('children', t.get('children').add(tChild));
+                    t.set('children', t.get('children').push(tChild));
                 } else {    // 2.i.c
                     let newO = O.delete(S);
                     let newP = P.add(not(sigma));
@@ -138,8 +142,9 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
                         .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
+                        // @todo path
                     
-                    t.set('children', t.get('children').add(tChild));
+                    t.set('children', t.get('children').push(tChild));
                 }
             }
         } else {    // 2.ii
@@ -176,8 +181,9 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
                 .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
+                // @todo path
             
-            t.set('children', t.get('children').add(tChild));
+            t.set('children', t.get('children').push(tChild));
         }
     } else if(turn == 'F') {    // 3
         // @todo
@@ -220,7 +226,7 @@ const fTConstructor = () =>
         C: Set(),
         F: Set(),
         step: 0,
-        children: Set(),    // Set of Tuples
+        children: List(),    // List of Tuples
         aborted: false,
         success: false,
         path: List(),
