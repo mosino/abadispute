@@ -394,16 +394,66 @@ describe('Algorithm', function () {
             });
 
             describe('turn == "O" (2)', function () {
-                describe('CbyD(sigma, D) == true and fCbyC(Set([sigma]), C) == true (2.i.b)', function () {
-                    it('should work', function () {
+                describe('sigma is in assumptions (2.i)', function () {
+                    it('Add a child for the "ignore"-branch (2.i.a)', function () {
                         let f = a.filtersGB;
                         let u = a.updtSimple;
                         let i = a.implementationSimple;
 
+                        f.fCbyD = (_C, _D) => false;
                         i.sel = (_P) => 'c';
                         i.turn = (_P, _O, _F, _recentPO) => 'O';
 
-                        assert.ok(true);
+                        let fw = {
+                            assumptions: ['c'],
+                        };
+
+                        let argA = fArgumentConstructor('a');
+                        let argB = fArgumentConstructor('b');
+                        let argC = fArgumentConstructor('c');
+                        
+                        argC = fArgumentAddSentences(argC, Set(['d']));
+
+                        let argCMarked = fMark(argC, 'c');
+
+                        let t = fTConstructor()
+                            .set('O', Set([argC, argA, argB]))
+                            .set('step', 2);
+
+                        let newT = fAlgorithmStep(f, u, i, fw, t);
+
+                        let newChildExpected = fTConstructor()
+                            .set('O', Set([argCMarked, argA, argB]))
+                            .set('step', 3)
+                            .set('recentPO', 'O');
+
+                        assert.ok(newT.get('children').first().equals(newChildExpected));
+                    });
+
+                    describe('Is defence and a culprit (2.i.b)', function () {
+                        it('Should move argument to F', function () {
+                            let f = a.filtersGB;
+                            let u = a.updtSimple;
+                            let i = a.implementationSimple;
+
+                            i.sel = (_P) => 'c';
+                            i.turn = (_P, _O, _F, _recentPO) => 'O';
+
+                            assert.ok(false);
+                        });
+                    });
+
+                    describe('Is a defence and no culprit (2.i.c)', function () {
+                        it('Should move argument to F, expand culprits, start counter-attack in "P"', function () {
+                            let f = a.filtersGB;
+                            let u = a.updtSimple;
+                            let i = a.implementationSimple;
+
+                            i.sel = (_P) => 'c';
+                            i.turn = (_P, _O, _F, _recentPO) => 'O';
+
+                            assert.ok(false);
+                        });
                     });
                 });
             });

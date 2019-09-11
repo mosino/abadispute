@@ -89,7 +89,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 t = t.set('aborted', true);
             }
         }
-    } else if(turn == 'O') {    // 2
+    } else if (turn == 'O') {    // 2
         let S = i.memberO(O);
         let sigma = i.sel(fGetUnmarked(S));
 
@@ -109,7 +109,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('success', P.size == 0 && newOA.size == 0 && F.size == 0);
                 // @todo path
             
-            t.set('children', t.get('children').push(tChildA));
+            t = t.set('children', t.get('children').push(tChildA));
 
             if (f.fCbyD(sigma, D)) {
                 if (f.fCbyC(Set([sigma]), C)) {   // 2.i.b
