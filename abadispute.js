@@ -127,7 +127,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
                         // @todo path
                         
-                    t.set('children', t.get('children').push(tChild));
+                    t = t.set('children', t.get('children').push(tChild));
                 } else {    // 2.i.c
                     let newO = O.delete(S);
                     let newP = P.add(not(sigma));
@@ -144,7 +144,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
                         // @todo path
                     
-                    t.set('children', t.get('children').push(tChild));
+                    t = t.set('children', t.get('children').push(tChild));
                 }
             }
         } else {    // 2.ii
@@ -183,7 +183,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
                 // @todo path
             
-            t.set('children', t.get('children').push(tChild));
+            t = t.set('children', t.get('children').push(tChild));
         }
     } else if(turn == 'F') {    // 3
         // @todo

@@ -432,14 +432,38 @@ describe('Algorithm', function () {
 
                     describe('Is defence and a culprit (2.i.b)', function () {
                         it('Should move argument to F', function () {
-                            let f = a.filtersGB;
-                            let u = a.updtSimple;
+                            let f = a.filtersIB;
+                            let u = a.updtIB;
                             let i = a.implementationSimple;
 
+                            f.fCbyD = (_C, _D) => true;
+                            f.fCbyC = (_C, _D) => true;
                             i.sel = (_P) => 'c';
                             i.turn = (_P, _O, _F, _recentPO) => 'O';
 
-                            assert.ok(false);
+                            let fw = {
+                                assumptions: ['c'],
+                            };
+
+                            let argA = fArgumentConstructor('a');
+                            let argB = fArgumentConstructor('b');
+                            let argC = fArgumentConstructor('c');
+                            
+                            argC = fArgumentAddSentences(argC, Set(['d']));
+
+                            let t = fTConstructor()
+                                .set('O', Set([argC, argA, argB]))
+                                .set('step', 3);
+
+                            let newT = fAlgorithmStep(f, u, i, fw, t);
+
+                            let newChildExpected = fTConstructor()
+                                .set('O', Set([argA, argB]))
+                                .set('F', Set(['c', 'd']))
+                                .set('step', 4)
+                                .set('recentPO', 'O');
+
+                            assert.ok(newT.get('children').get(1).equals(newChildExpected));
                         });
                     });
 
@@ -449,6 +473,12 @@ describe('Algorithm', function () {
                             let u = a.updtSimple;
                             let i = a.implementationSimple;
 
+                            let fw = {
+                                assumptions: ['c'],
+                            };
+
+                            f.fCbyD = (_C, _D) => true;
+                            f.fCbyC = (_C, _D) => false;
                             i.sel = (_P) => 'c';
                             i.turn = (_P, _O, _F, _recentPO) => 'O';
 
