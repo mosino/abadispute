@@ -52,9 +52,7 @@ describe('Helpers', function () {
                 })
             ));
         });
-    });
 
-    describe('#fDeleteFromArgument', function () {
         it('If not marked, should remove "mySentence" from "s"', function () {
             let argument = Map({
                 s: Set(['a', 'b', 'c', 'mySentence']),
@@ -70,9 +68,7 @@ describe('Helpers', function () {
                 })
             ));
         });
-    });
 
-    describe('#fDeleteFromArgument', function () {
         it('If not in argument, should do nothing', function () {
             let argument = Map({
                 s: Set(['a', 'b', 'c']),
@@ -106,9 +102,7 @@ describe('Helpers', function () {
                 })
             ));
         });
-    });
 
-    describe('#fArgumentAddSentences', function () {
         it('Should add "mySentence1" and "mySentece2" to "s"', function () {
             let argument = Map({
                 s: Set(['a', 'b', 'c']),
@@ -157,9 +151,7 @@ describe('Helpers', function () {
                 })
             ));
         });
-    });
 
-    describe('#fMark', function () {
         it('If not in argument, shoud do nothing', function () {
             let argument = Map({
                 s: Set(['a', 'b', 'c']),
@@ -180,10 +172,12 @@ describe('Helpers', function () {
     describe('#fGetInitialT', function () {
         it('If "s" is in the assumptions, "P" should contain "a", "D" should contain "a"', function () {
             let framework = {
-                rules: {
-                    h: 'a',
-                    b: 's'
-                },
+                rules: [
+                    {
+                        h: 'a',
+                        b: 's'
+                    }
+                ],
                 assumptions: ['s'],
                 contraries: {
                     's': '-s'
@@ -258,6 +252,55 @@ describe('Helpers', function () {
                 node6.delete('children'), 
                 node7.delete('children')
             ])));
+        });
+    });
+});
+
+describe('Algorithm', function () {
+    describe('#fAlgorithmStep', function () {
+        describe('turn == "P"', function () {
+            let i = a.implementationSimple;
+            let f = a.filtersGB;
+            let u = a.updtSimple;
+
+            i.turn = (_P, _O, _F, _recentPO) => 'P';
+            i.sel = (_P) => 'c';
+
+            describe('sigma is in assumptions', function () {
+                it('Should remove "c" from "P" and add "d" to "O"', function () {
+                    let fw = {
+                        rules: [
+                            {
+                                h: 'a',
+                                b: 'b'
+                            }
+                        ],
+                        assumptions: ['c'],
+                        contraries: {
+                            'c': 'd'
+                        }
+                    };
+
+                    let argA = fArgumentConstructor('a');
+                    let argB = fArgumentConstructor('b');
+                    let argC = fArgumentConstructor('c');
+                    let argNotC = fArgumentConstructor('d');
+
+                    let t = fTConstructor()
+                        .set('P', Set(['a', 'b', 'c', 'd']))
+                        .set('O', Set([argA, argB, argC]))
+                        .set('step', 4);
+
+                    let newT = fAlgorithmStep(f, u, i, fw, t);
+                    let newTExpected = fTConstructor()
+                        .set('P', Set(['a', 'b', 'd']))
+                        .set('O', Set([argA, argB, argC, argNotC]))
+                        .set('recentPO', 'O')
+                        .set('step', 5);
+
+                    assert.ok(newT.get('children').first().equals(newTExpected));
+                });
+            });
         });
     });
 });

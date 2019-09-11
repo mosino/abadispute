@@ -53,7 +53,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
                 // @todo path
 
-            t.set('children', List([tChild]));
+            t = t.set('children', t.get('children').push(tChild));
         } else {    // 1.ii
             let ruleExists = false;
 
