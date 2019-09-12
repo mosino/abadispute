@@ -295,7 +295,8 @@ describe('Algorithm', function () {
                             .set('P', Set(['a', 'b', 'd']))
                             .set('O', Set([argA, argB, argC, argNotC]))
                             .set('recentPO', 'O')
-                            .set('step', 5);
+                            .set('step', 5)
+                            .set('path', List([0]));
 
                         assert.ok(newT.get('children').first().equals(newChildExpected));
                     });
@@ -379,12 +380,14 @@ describe('Algorithm', function () {
                                 .set('P', Set(['x', 'a', 'd']))
                                 .set('D', Set(['y', 'd']))
                                 .set('step', 8)
-                                .set('recentPO', 'P'),
+                                .set('recentPO', 'P')
+                                .set('path', List([0])),
                             fTConstructor()
                                 .set('P', Set(['x', 'b']))
                                 .set('D', Set(['y']))
                                 .set('step', 8)
-                                .set('recentPO', 'P'),
+                                .set('recentPO', 'P')
+                                .set('path', List([1])),
                         ]));
 
                         assert.ok(newT.equals(newTExpected));
@@ -429,12 +432,13 @@ describe('Algorithm', function () {
                         let newChildExpected = fTConstructor()
                             .set('O', Set([argCMarked, argA, argB]))
                             .set('step', 3)
-                            .set('recentPO', 'O');
+                            .set('recentPO', 'O')
+                            .set('path', List([0]));
 
                         assert.ok(newT.get('children').first().equals(newChildExpected));
                     });
 
-                    describe('Is defence and a culprit (2.i.b)', function () {
+                    describe('Is a defence and a culprit (2.i.b)', function () {
                         it('Should move argument to F', function () {
                             let f = {
                                 fDbyC: a.filtersIB.fDbyC,
@@ -468,7 +472,8 @@ describe('Algorithm', function () {
                                 .set('O', Set([argA, argB]))
                                 .set('F', Set(['c', 'd']))
                                 .set('step', 4)
-                                .set('recentPO', 'O');
+                                .set('recentPO', 'O')
+                                .set('path', List([1]));
 
                             assert.ok(newT.get('children').get(1).equals(newChildExpected));
                         });
@@ -517,7 +522,8 @@ describe('Algorithm', function () {
                                 .set('F', Set(['c', 'd']))
                                 .set('P', Set(['z', 'notc']))
                                 .set('step', 4)
-                                .set('recentPO', 'P');
+                                .set('recentPO', 'P')
+                                .set('path', List([1]));
 
                             assert.ok(newT.get('children').get(1).equals(newChildExpected));
                         });
@@ -590,7 +596,8 @@ describe('Algorithm', function () {
                             .set('F', Set(['x', 'y', 'a', 'b', 'd', 'e', 'h']))
                             .set('C', Set(['a', 'b', 'd', 'h']))
                             .set('step', 8)
-                            .set('recentPO', 'O');
+                            .set('recentPO', 'O')
+                            .set('path', List([0]));
 
                         assert.ok(newT.get('children').first().equals(newChildExpected));
                     });

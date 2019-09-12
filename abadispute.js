@@ -50,8 +50,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('recentPO', 'O')
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
-                .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
-                // @todo path
+                .set('success', newP.size == 0 && newO.size == 0 && F.size == 0)
+                .set('path', t.get('path').push(t.get('children').size));
 
             t = t.set('children', t.get('children').push(tChild));
         } else {    // 1.ii
@@ -76,8 +76,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                                 .set('recentPO', 'P')
                                 .set('step', t.get('step') + 1)
                                 .set('aborted', false)
-                                .set('success', newP.size == 0 && O.size == 0 && F.size == 0);
-                                // @todo path
+                                .set('success', newP.size == 0 && O.size == 0 && F.size == 0)
+                                .set('path', t.get('path').push(t.get('children').size));
 
                             t = t.set('children', t.get('children').push(tChild));
                         }
@@ -106,8 +106,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('recentPO', 'O')
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
-                .set('success', P.size == 0 && newOA.size == 0 && F.size == 0);
-                // @todo path
+                .set('success', P.size == 0 && newOA.size == 0 && F.size == 0)
+                .set('path', t.get('path').push(t.get('children').size));
             
             t = t.set('children', t.get('children').push(tChildA));
 
@@ -124,8 +124,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('recentPO', 'O')
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
-                        .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
-                        // @todo path
+                        .set('success', P.size == 0 && newO.size == 0 && F.size == 0)
+                        .set('path', t.get('path').push(t.get('children').size));
                         
                     t = t.set('children', t.get('children').push(tChild));
                 } else {    // 2.i.c
@@ -141,8 +141,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('recentPO', 'P')
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
-                        .set('success', newP.size == 0 && newO.size == 0 && F.size == 0);
-                        // @todo path
+                        .set('success', newP.size == 0 && newO.size == 0 && F.size == 0)
+                        .set('path', t.get('path').push(t.get('children').size));
                     
                     t = t.set('children', t.get('children').push(tChild));
                 }
@@ -180,8 +180,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('recentPO', 'O')
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
-                .set('success', P.size == 0 && newO.size == 0 && F.size == 0);
-                // @todo path
+                .set('success', P.size == 0 && newO.size == 0 && F.size == 0)
+                .set('path', t.get('path').push(t.get('children').size));
             
             t = t.set('children', t.get('children').push(tChild));
         }
