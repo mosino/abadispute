@@ -2,6 +2,7 @@ const { Map, Set, List } = require('immutable');
 
 // recursive call
 const fCompute = (filters, updt, implementation, framework, t) => n => {
+    console.log(n, t.get('step'));
     if (n > t.get('step') && !t.get('aborted') && !t.get('success')) {
         if (t.get('children').size == 0) {
             t = fAlgorithmStep(filters, updt, implementation, framework, t);
@@ -277,7 +278,10 @@ module.exports = {
             let getPath = branch => getBranches().get(branch).get('path');
 
             return {
-                compute: fCompute(filters, updt, implementation, framework, t),
+                compute: (n) => {
+                    t = fCompute(filters, updt, implementation, framework, t)(n);
+                    console.log(t);
+                },
                 getBranches,
                 getSupport: branch => getBranches().get(branch).get('D'),
                 getDerivation: branch => 
