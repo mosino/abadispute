@@ -179,9 +179,7 @@ describe('Helpers', function () {
                     }
                 ],
                 assumptions: ['s'],
-                contraries: {
-                    's': '-s'
-                }
+                contraries: { 's': '-s' }
             };
 
             let t = fGetInitialT(framework, 's');
@@ -264,10 +262,12 @@ describe('Algorithm', function () {
                     it('Should remove "c" from "P" and add "d" to "O"', function () {
                         let f = a.filtersGB;
                         let u = a.updtSimple;
-                        let i = a.implementationSimple;
-
-                        i.sel = (_P) => 'c';
-                        i.turn = (_P, _O, _F, _recentPO) => 'P';
+                        let i = {
+                            sel: (_P) => 'c',
+                            turn: (_P, _O, _F, _recentPO) => 'P',
+                            memberO: a.implementationSimple.memberO,
+                            memberF: a.implementationSimple.memberF,
+                        };
 
                         let fw = {
                             rules: [
@@ -277,9 +277,7 @@ describe('Algorithm', function () {
                                 }
                             ],
                             assumptions: ['c'],
-                            contraries: {
-                                'c': 'd'
-                            }
+                            contraries: { 'c': 'd' }
                         };
 
                         let argA = fArgumentConstructor('a');
@@ -307,10 +305,12 @@ describe('Algorithm', function () {
                     it('If there is no corresponding rule, should abort branch', function () {
                         let f = a.filtersGB;
                         let u = a.updtSimple;
-                        let i = a.implementationSimple;
-
-                        i.sel = (_P) => 'c';
-                        i.turn = (_P, _O, _F, _recentPO) => 'P';
+                        let i = {
+                            sel: (_P) => 'c',
+                            turn: (_P, _O, _F, _recentPO) => 'P',
+                            memberO: a.implementationSimple.memberO,
+                            memberF: a.implementationSimple.memberF,
+                        };
 
                         let fw = {
                             rules: [
@@ -320,9 +320,7 @@ describe('Algorithm', function () {
                                 }
                             ],
                             assumptions: ['d'],
-                            contraries: {
-                                'd': 'c'
-                            }
+                            contraries: { 'd': 'c' }
                         };
 
                         let argA = fArgumentConstructor('a');
@@ -347,10 +345,13 @@ describe('Algorithm', function () {
                     it('If there are corresponding rules, should add a child for each of them', function () {
                         let f = a.filtersGB;
                         let u = a.updtSimple;
-                        let i = a.implementationSimple;
-
-                        i.sel = (_P) => 'c';
-                        i.turn = (_P, _O, _F, _recentPO) => 'P';
+                        
+                        let i = {
+                            sel: (_P) => 'c',
+                            turn: (_P, _O, _F, _recentPO) => 'P',
+                            memberO: a.implementationSimple.memberO,
+                            memberF: a.implementationSimple.memberF,
+                        };
 
                         let fw = {
                             rules: [
@@ -364,9 +365,7 @@ describe('Algorithm', function () {
                                 }
                             ],
                             assumptions: ['d'],
-                            contraries: {
-                                'd': 'c'
-                            }
+                            contraries: { 'd': 'c' }
                         };
 
                         let t = fTConstructor()
@@ -395,18 +394,23 @@ describe('Algorithm', function () {
 
             describe('turn == "O" (2)', function () {
                 describe('sigma is in assumptions (2.i)', function () {
-                    it('Add a child for the "ignore"-branch (2.i.a)', function () {
-                        let f = a.filtersGB;
+                    it('Should add a child for the "ignore"-branch (2.i.a)', function () {
                         let u = a.updtSimple;
-                        let i = a.implementationSimple;
 
-                        f.fCbyD = (_C, _D) => false;
-                        i.sel = (_P) => 'c';
-                        i.turn = (_P, _O, _F, _recentPO) => 'O';
-
-                        let fw = {
-                            assumptions: ['c'],
+                        let f = {
+                            fDbyC: a.filtersGB.fDbyC,
+                            fDbyD: a.filtersGB.fDbyD,
+                            fCbyD: (_C, _D) => false,
+                            fCbyC: a.filtersGB.fCbyC,
                         };
+                        let i = {
+                            sel: (_P) => 'c',
+                            turn: (_P, _O, _F, _recentPO) => 'O',
+                            memberO: a.implementationSimple.memberO,
+                            memberF: a.implementationSimple.memberF,
+                        };
+
+                        let fw = { assumptions: ['c'] };
 
                         let argA = fArgumentConstructor('a');
                         let argB = fArgumentConstructor('b');
@@ -432,18 +436,21 @@ describe('Algorithm', function () {
 
                     describe('Is defence and a culprit (2.i.b)', function () {
                         it('Should move argument to F', function () {
-                            let f = a.filtersIB;
-                            let u = a.updtIB;
-                            let i = a.implementationSimple;
-
-                            f.fCbyD = (_C, _D) => true;
-                            f.fCbyC = (_C, _D) => true;
-                            i.sel = (_P) => 'c';
-                            i.turn = (_P, _O, _F, _recentPO) => 'O';
-
-                            let fw = {
-                                assumptions: ['c'],
+                            let f = {
+                                fDbyC: a.filtersIB.fDbyC,
+                                fDbyD: a.filtersIB.fDbyD,
+                                fCbyD: (_C, _D) => true,
+                                fCbyC: (_C, _D) => true,
                             };
+                            let u = a.updtIB;
+                            let i = {
+                                sel: (_P) => 'c',
+                                turn: (_P, _O, _F, _recentPO) => 'O',
+                                memberO: a.implementationSimple.memberO,
+                                memberF: a.implementationSimple.memberF,
+                            };
+
+                            let fw = { assumptions: ['c'] };
 
                             let argA = fArgumentConstructor('a');
                             let argB = fArgumentConstructor('b');
@@ -469,20 +476,23 @@ describe('Algorithm', function () {
 
                     describe('Is a defence and no culprit (2.i.c)', function () {
                         it('Should move argument to F, expand culprits, start counter-attack in "P"', function () {
-                            let f = a.filtersIB;
+                            let f = {
+                                fDbyC: a.filtersIB.fDbyC,
+                                fDbyD: a.filtersIB.fDbyD,
+                                fCbyD: (_C, _D) => true,
+                                fCbyC: (_C, _D) => false,
+                            };
                             let u = a.updtIB;
-                            let i = a.implementationSimple;
-
-                            f.fCbyD = (_C, _D) => true;
-                            f.fCbyC = (_C, _D) => false;
-                            i.sel = (_P) => 'c';
-                            i.turn = (_P, _O, _F, _recentPO) => 'O';
+                            let i = {
+                                sel: (_P) => 'c',
+                                turn: (_P, _O, _F, _recentPO) => 'O',
+                                memberO: a.implementationSimple.memberO,
+                                memberF: a.implementationSimple.memberF,
+                            };
 
                             let fw = {
                                 assumptions: ['c', 'notc'],
-                                contraries: {
-                                    'c': 'notc'
-                                }
+                                contraries: { 'c': 'notc' }
                             };
 
                             let argA = fArgumentConstructor('a');
@@ -511,6 +521,78 @@ describe('Algorithm', function () {
 
                             assert.ok(newT.get('children').get(1).equals(newChildExpected));
                         });
+                    });
+                });
+                describe('sigma is not in assumptions (2.ii)', function () {
+                    it('Should unfold premise with all rules, add new arguments to "F" if dealt with, to "O" if not', function () {
+                        let f = a.filtersIB;
+                        let u = a.updtIB;
+
+                        let i = {
+                            sel: (_P) => 'c',
+                            turn: (_P, _O, _F, _recentPO) => 'O',
+                            memberO: a.implementationSimple.memberO,
+                            memberF: a.implementationSimple.memberF,
+                        };
+
+                        let fw = {
+                            assumptions: ['a'],
+                            rules: [
+                                {
+                                    h: 'c',
+                                    b: ['a', 'b']
+                                },
+                                {
+                                    h: 'c',
+                                    b: ['d', 'e']
+                                },
+                                {
+                                    h: 'c',
+                                    b: ['f', 'g']
+                                },
+                                {
+                                    h: 'c',
+                                    b: ['h']
+                                },
+                                {
+                                    h: 'c',
+                                    b: ['i']
+                                },
+                                {
+                                    h: 'b',
+                                    b: ['a']
+                                }
+                            ]
+                        };
+
+                        let argA = fArgumentConstructor('a');
+                        let argB = fArgumentConstructor('b');
+                        let argC = fArgumentConstructor('c');
+                        
+                        argC = fArgumentAddSentences(argC, Set(['y']));
+
+                        let t = fTConstructor()
+                            .set('O', Set([argC, argA, argB]))
+                            .set('F', Set(['x']))
+                            .set('C', Set(['a', 'b', 'd', 'h']))
+                            .set('step', 7);
+
+                        let newT = fAlgorithmStep(f, u, i, fw, t);
+
+                        let argChildC1 = fArgumentConstructor('y');
+                        let argChildC2 = fArgumentConstructor('y');
+                        
+                        argChildC1 = fArgumentAddSentences(argChildC1, Set(['f', 'g']));
+                        argChildC2 = fArgumentAddSentences(argChildC2, Set(['i']));
+
+                        let newChildExpected = fTConstructor()
+                            .set('O', Set([argA, argB, argChildC1, argChildC2]))
+                            .set('F', Set(['x', 'y', 'a', 'b', 'd', 'e', 'h']))
+                            .set('C', Set(['a', 'b', 'd', 'h']))
+                            .set('step', 8)
+                            .set('recentPO', 'O');
+
+                        assert.ok(newT.get('children').first().equals(newChildExpected));
                     });
                 });
             });

@@ -153,8 +153,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
 
             R.map(rule => {
                 if (rule.h == sigma) {
-                    if (f.fCbyC(rule.b, C)) {
-                        updateFWith = updateFWith.add(
+                    if (f.fCbyC(Set(rule.b), C)) {
+                        updateFWith = updateFWith.union(
                             S.get('s')
                                 .delete(sigma)
                                 .union(Set(rule.b))
@@ -293,7 +293,7 @@ module.exports = {
         fDbyC: (R, C) => R.intersect(C).size == 0,
         fDbyD: (R, D) => R.subtract(D),
         fCbyD: (s, D) => !D.contains(s),
-        fCbyC: (R, C) => R.intersect(C).size != 0,
+        fCbyC: (R, C) => R.intersect(C).size != 0
     },
     
     filtersGB: {
@@ -307,7 +307,7 @@ module.exports = {
         fDbyC: (R, C) => this.filtersAB(R, C),
         fDbyD: (R, D) => R.subtract(D),
         fCbyD: (s, D) => !D.contains(s),
-        fCbyC: (R, C) => R.intersect(C).size != 0,
+        fCbyC: (R, C) => R.intersect(C).size != 0
     },
     
     updtSimple: (F, _S) => F,

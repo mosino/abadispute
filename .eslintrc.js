@@ -108,7 +108,6 @@ module.exports = {
         'lines-around-comment': 'error',
         'lines-around-directive': 'error',
         'lines-between-class-members': 'error',
-        'max-classes-per-file': 'error',
         'max-depth': 'error',
         'max-len': 'off',
         'max-lines-per-function': 'off',
