@@ -96,7 +96,9 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
         let S = i.memberO(O);
         let sigma = i.sel(fGetUnmarked(S));
 
-        if (A.includes(sigma)) {    // 2.i
+        if (sigma === null) {
+            t = t.set('aborted', true);
+        } else if (A.includes(sigma)) {    // 2.i
             // 2.i.a
             let newOA = O.delete(S).add(fMark(S, sigma));
 
@@ -200,8 +202,6 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
     } else {
         console.error('"turn" returned an unexpected value');
     }
-
-    if(t.get('children').size == 0 && !t.get('success')) t = t.set('aborted', true);
 
     return t;
 };
