@@ -6,41 +6,41 @@ const abaframework = {
     rules: [
         {
             h: 'p',
+            b: ['q']   
+        },
+        {
+            h: 'p',
             b: ['a']   
         },
         {
-            h: 'q',
-            b: ['b']   
-        },
-        {
             h: 'r',
-            b: ['c']   
+            b: ['b', 'c']   
         },
         {
-            h: 's',
-            b: ['b']
+            h: 't',
+            b: []   
         }
     ],
     assumptions: ['a', 'b', 'c'],
     contraries: {
-        'a': 'q',
-        'b': 'r',
-        'c': 's'
+        'a': 'r',
+        'b': 's',
+        'c': 't'
     }
 };
 
 const sentenceToCheck = 'p';
 
-let instanceAB = abadispute(filtersAB, updtSimple, implementationSimple);
-let dispute1ABinstance = instanceAB(abaframework, sentenceToCheck);
+let instanceGB = abadispute(filtersGB, updtSimple, implementationSimple);
+let dispute1GBinstance = instanceGB(abaframework, sentenceToCheck);
 
-dispute1ABinstance.compute(8);
+dispute1GBinstance.compute(8);
 
-let branches = dispute1ABinstance.getBranches();
+let branches = dispute1GBinstance.getBranches();
 
 branches.map((v, k) => {
-    let derivation = dispute1ABinstance.getDerivation(k);
-    let support = dispute1ABinstance.getSupport(k);
+    let derivation = dispute1GBinstance.getDerivation(k);
+    let support = dispute1GBinstance.getSupport(k);
 
     console.log('\n------------');
     console.log(`Branch ${k}:`);

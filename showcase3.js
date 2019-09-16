@@ -29,7 +29,7 @@ const abaframework = {
     }
 };
 
-const sentenceToCheck = 'p';
+const sentenceToCheck = 'r';
 
 let instanceAB = abadispute(filtersAB, updtSimple, implementationSimple);
 let dispute1ABinstance = instanceAB(abaframework, sentenceToCheck);

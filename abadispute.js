@@ -197,7 +197,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
             
             t = t.set('children', t.get('children').push(tChild));
         }
-    } else if(turn == 'F') {    // 3
+    } else if (turn == 'F') {    // 3
         // @todo
     } else {
         console.error('"turn" returned an unexpected value');
