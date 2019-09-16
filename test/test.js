@@ -9,7 +9,7 @@ const assert = require('assert');
 const { Map, Set, List } = require('immutable');
 const a = rewire('../abadispute.js');
 
-const fCompute = a.__get__('fCompute');
+// const fCompute = a.__get__('fCompute');
 const fAlgorithmStep = a.__get__('fAlgorithmStep');
 const fArgumentConstructor = a.__get__('fArgumentConstructor');
 const fDeleteFromArgument = a.__get__('fDeleteFromArgument');

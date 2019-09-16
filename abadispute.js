@@ -52,7 +52,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
                 .set('success', newP.size == 0 && newO.size == 0 && F.size == 0)
-                .set('path', t.get('path').push(t.get('children').size));
+                .set('path', t.get('path').push(t.get('children').size))
+                .set('by', '1.i');
 
             t = t.set('children', t.get('children').push(tChild));
         } else {    // 1.ii
@@ -78,7 +79,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                                 .set('step', t.get('step') + 1)
                                 .set('aborted', false)
                                 .set('success', newP.size == 0 && O.size == 0 && F.size == 0)
-                                .set('path', t.get('path').push(t.get('children').size));
+                                .set('path', t.get('path').push(t.get('children').size))
+                                .set('by', '1.ii');
 
                             t = t.set('children', t.get('children').push(tChild));
                         }
@@ -108,7 +110,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
                 .set('success', P.size == 0 && newOA.size == 0 && F.size == 0)
-                .set('path', t.get('path').push(t.get('children').size));
+                .set('path', t.get('path').push(t.get('children').size))
+                .set('by', '2.i.a');
             
             t = t.set('children', t.get('children').push(tChildA));
 
@@ -127,7 +130,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
                         .set('success', P.size == 0 && newO.size == 0 && newF.size == 0)
-                        .set('path', t.get('path').push(t.get('children').size));
+                        .set('path', t.get('path').push(t.get('children').size))
+                        .set('by', '2.i.b');
                     
                     t = t.set('children', t.get('children').push(tChild));
                 } else {    // 2.i.c
@@ -145,7 +149,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
                         .set('success', newP.size == 0 && newO.size == 0 && newF.size == 0)
-                        .set('path', t.get('path').push(t.get('children').size));
+                        .set('path', t.get('path').push(t.get('children').size))
+                        .set('by', '2.i.c');
                     
                     t = t.set('children', t.get('children').push(tChild));
                 }
@@ -185,7 +190,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
                 .set('success', P.size == 0 && newO.size == 0 && newF.size == 0)
-                .set('path', t.get('path').push(t.get('children').size));
+                .set('path', t.get('path').push(t.get('children').size))
+                .set('by', '2.ii');
             
             t = t.set('children', t.get('children').push(tChild));
         }
@@ -289,7 +295,7 @@ module.exports = {
                 getBranches,
                 getSupport: branch => {
                     let leaf = getBranches().get(branch);
-                    
+
                     return leaf.get('success') ? 
                         leaf.get('D') : 
                         null;

@@ -6,22 +6,26 @@ const abaframework = {
     rules: [
         {
             h: 'p',
+            b: ['q']   
+        },
+        {
+            h: 'p',
             b: ['a']   
         },
         {
-            h: 'q',
-            b: ['b']   
+            h: 'r',
+            b: ['b', 'c']   
         },
         {
-            h: 'r',
-            b: ['c']   
+            h: 't',
+            b: []   
         }
     ],
     assumptions: ['a', 'b', 'c'],
     contraries: {
-        'a': 'q',
-        'b': 'r',
-        'c': 's'
+        'a': 'r',
+        'b': 's',
+        'c': 't'
     }
 };
 
