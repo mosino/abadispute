@@ -7,7 +7,7 @@ const fCompute = (filters, updt, implementation, framework, t) => n => {
             t = fAlgorithmStep(filters, updt, implementation, framework, t);
         }
         
-        t.set(
+        t = t.set(
             'children', 
             t.get('children').map(
                 tChild => fCompute(filters, updt, implementation, framework, tChild)(n)
@@ -253,7 +253,7 @@ const fGetBranches = tList => {
             if (t.get('children').size == 0) {
                 branches = branches.push(t);
             } else {
-                branches = branches.concat(fGetBranches(Set(t.get('children'))));
+                branches = branches.concat(fGetBranches(t.get('children')));
             }
         }
     );
@@ -287,7 +287,13 @@ module.exports = {
                     t = fCompute(filters, updt, implementation, framework, t)(n);
                 },
                 getBranches,
-                getSupport: branch => getBranches().get(branch).get('D'),
+                getSupport: branch => {
+                    let leaf = getBranches().get(branch);
+                    
+                    return leaf.get('success') ? 
+                        leaf.get('D') : 
+                        null;
+                },
                 getDerivation: branch => 
                     fGetDerivation(
                         t, 
