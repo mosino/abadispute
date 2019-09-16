@@ -34,7 +34,7 @@ const sentenceToCheck = 'p';
 let instanceGB = abadispute(filtersGB, updtSimple, implementationSimple);
 let dispute1GBinstance = instanceGB(abaframework, sentenceToCheck);
 
-dispute1GBinstance.compute(8);
+dispute1GBinstance.compute(30);
 
 let branches = dispute1GBinstance.getBranches();
 
