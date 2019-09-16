@@ -2,8 +2,7 @@ const { Map, Set, List } = require('immutable');
 
 // recursive call
 const fCompute = (filters, updt, implementation, framework, t) => n => {
-    console.log(n, t.get('step'));
-    if (n > t.get('step') && !t.get('aborted') && !t.get('success')) {
+    if (n >= t.get('step')) {
         if (t.get('children').size == 0) {
             t = fAlgorithmStep(filters, updt, implementation, framework, t);
         }
@@ -21,6 +20,8 @@ const fCompute = (filters, updt, implementation, framework, t) => n => {
 
 // X-dispute derivations
 const fAlgorithmStep = (f, updt, i, fw, t) => {
+    if (t.get('aborted') || t.get('success')) return t;
+
     let P = t.get('P');
     let O = t.get('O');
     let D = t.get('D');
@@ -34,7 +35,6 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
         fw.contraries :
         (a => fw.contraries[a]);
     
-
     if (turn == 'P') {  // 1
         let sigma = i.sel(P);
 
@@ -115,34 +115,36 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
             if (f.fCbyD(sigma, D)) {
                 if (f.fCbyC(Set([sigma]), C)) {   // 2.i.b
                     let newO = O.delete(S);
+                    let newF = updt(F, S.get('s'));
 
                     let tChild = fTConstructor()
                         .set('O', newO)
-                        .set('F', updt(F, S.get('s')))
+                        .set('F', newF)
                         .set('P', P)
                         .set('D', D)
                         .set('C', C)
                         .set('recentPO', 'O')
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
-                        .set('success', P.size == 0 && newO.size == 0 && F.size == 0)
+                        .set('success', P.size == 0 && newO.size == 0 && newF.size == 0)
                         .set('path', t.get('path').push(t.get('children').size));
-                        
+                    
                     t = t.set('children', t.get('children').push(tChild));
                 } else {    // 2.i.c
                     let newO = O.delete(S);
                     let newP = P.add(not(sigma));
+                    let newF = updt(F, S.get('s'));
 
                     let tChild = fTConstructor()
                         .set('O', newO)
                         .set('C', C.add(sigma))
                         .set('D', D.union(A.intersect(Set([not(sigma)]))))
-                        .set('F', updt(F, S.get('s')))
+                        .set('F', newF)
                         .set('P', newP)
                         .set('recentPO', 'P')
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
-                        .set('success', newP.size == 0 && newO.size == 0 && F.size == 0)
+                        .set('success', newP.size == 0 && newO.size == 0 && newF.size == 0)
                         .set('path', t.get('path').push(t.get('children').size));
                     
                     t = t.set('children', t.get('children').push(tChild));
@@ -171,17 +173,18 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 }
             });
 
+            let newF = updt(F, updateFWith);
 
             let tChild = fTConstructor()       
                 .set('O', newO)
-                .set('F', updt(F, updateFWith))
+                .set('F', newF)
                 .set('P', P)
                 .set('D', D)
                 .set('C', C)
                 .set('recentPO', 'O')
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
-                .set('success', P.size == 0 && newO.size == 0 && F.size == 0)
+                .set('success', P.size == 0 && newO.size == 0 && newF.size == 0)
                 .set('path', t.get('path').push(t.get('children').size));
             
             t = t.set('children', t.get('children').push(tChild));
@@ -191,6 +194,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
     } else {
         console.error('"turn" returned an unexpected value');
     }
+
+    if(t.get('children').size == 0 && !t.get('success')) t = t.set('aborted', true);
 
     return t;
 };
@@ -280,7 +285,6 @@ module.exports = {
             return {
                 compute: (n) => {
                     t = fCompute(filters, updt, implementation, framework, t)(n);
-                    console.log(t);
                 },
                 getBranches,
                 getSupport: branch => getBranches().get(branch).get('D'),
