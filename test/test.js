@@ -296,7 +296,8 @@ describe('Algorithm', function () {
                             .set('O', Set([argA, argB, argC, argNotC]))
                             .set('recentPO', 'O')
                             .set('step', 5)
-                            .set('path', List([0]));
+                            .set('path', List([0]))
+                            .set('by', '1.i');
 
                         assert.ok(newT.get('children').first().equals(newChildExpected));
                     });
@@ -381,13 +382,15 @@ describe('Algorithm', function () {
                                 .set('D', Set(['y', 'd']))
                                 .set('step', 8)
                                 .set('recentPO', 'P')
-                                .set('path', List([0])),
+                                .set('path', List([0]))
+                                .set('by', '1.ii'),
                             fTConstructor()
                                 .set('P', Set(['x', 'b']))
                                 .set('D', Set(['y']))
                                 .set('step', 8)
                                 .set('recentPO', 'P')
-                                .set('path', List([1])),
+                                .set('path', List([1]))
+                                .set('by', '1.ii')
                         ]));
 
                         assert.ok(newT.equals(newTExpected));
@@ -433,7 +436,8 @@ describe('Algorithm', function () {
                             .set('O', Set([argCMarked, argA, argB]))
                             .set('step', 3)
                             .set('recentPO', 'O')
-                            .set('path', List([0]));
+                            .set('path', List([0]))
+                            .set('by', '2.i.a');
 
                         assert.ok(newT.get('children').first().equals(newChildExpected));
                     });
@@ -473,7 +477,8 @@ describe('Algorithm', function () {
                                 .set('F', Set(['c', 'd']))
                                 .set('step', 4)
                                 .set('recentPO', 'O')
-                                .set('path', List([1]));
+                                .set('path', List([1]))
+                                .set('by', '2.i.b');
 
                             assert.ok(newT.get('children').get(1).equals(newChildExpected));
                         });
@@ -523,7 +528,8 @@ describe('Algorithm', function () {
                                 .set('P', Set(['z', 'notc']))
                                 .set('step', 4)
                                 .set('recentPO', 'P')
-                                .set('path', List([1]));
+                                .set('path', List([1]))
+                                .set('by', '2.i.c');
 
                             assert.ok(newT.get('children').get(1).equals(newChildExpected));
                         });
@@ -597,7 +603,8 @@ describe('Algorithm', function () {
                             .set('C', Set(['a', 'b', 'd', 'h']))
                             .set('step', 8)
                             .set('recentPO', 'O')
-                            .set('path', List([0]));
+                            .set('path', List([0]))
+                            .set('by', '2.ii');
 
                         assert.ok(newT.get('children').first().equals(newChildExpected));
                     });
