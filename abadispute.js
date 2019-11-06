@@ -1,6 +1,6 @@
 const { Map, Set, List } = require('immutable');
 
-// const h = require('./helpers');
+const h = require('./helpers');
 
 // recursive call
 const fCompute = (filters, updt, implementation, framework, t) => n => {
@@ -160,28 +160,8 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 }
             }
         } else {    // 2.ii
-            let newO = O.delete(S);
-            let updateFWith = Set();
-
-            R.map(rule => {
-                if (rule.h == sigma) {
-                    if (f.fCbyC(Set(rule.b), C)) {
-                        updateFWith = updateFWith.union(
-                            S.get('s')
-                                .delete(sigma)
-                                .union(Set(rule.b))
-                        );
-                    } else {
-                        newO = newO.add(
-                            fArgumentAddSentences(
-                                fDeleteFromArgument(S, sigma),
-                                Set(rule.b)
-                            )
-                        );
-                    }
-                }
-            });
-
+            let newO = h.step2iiComputeO(O, R, S, C, sigma, f.fCbyC);
+            let updateFWith = h.step2iiComputeUpdateFWith(R, S, C, sigma, f.fCbyC);
             let newF = updt(F, updateFWith);
 
             let tChild = fTConstructor()       
