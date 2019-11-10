@@ -11,7 +11,7 @@ const dConstructor = (P, O, A, C) =>
     });
 
 // branchConstructor: (closed: boolean, aborted: boolean, dList: D[]) => {closed: boolean, aborted: boolean, dList: D[]}
-const branchConstructor = (closed, dList) => 
+const branchConstructor = (closed, aborted, dList) => 
     Map({
        closed,
        aborted,
@@ -26,9 +26,9 @@ const algorithmStep = (D) => {
 // branchStepper: (f: (d: D => D[]), branches: Branch[]) => Branch[]
 const branchStepper = (f, branches) => {
     let branchedBranches = branches.map(branch =>
-        f(branch.last())
+        f(branch.get('dList').last())
             .map(newD => 
-                branch.push(newD)
+                branch.set('dList', branch.get('dList').push(newD))
             )
     );
 
@@ -42,18 +42,8 @@ module.exports = {
         let closedBranchExists = false;
 
         while (!closedBranchExists) {
-            let newBranches = List();
-
-            branches.filter(branch => !branch.closed).map(branch => {
-                let newDs = algorithmStep(branch.dList.last());
-
-                newDs.map(newD => {
-                    let newBranch = branch;
-
-                    newBranch.dList = newBranch.dList.push(newD);
-                    newBranches.push(newBranch);
-                });
-            });
+            branches = branchStepper(algorithmStep, branches);
+            closedBranchExists = branches.map(branch => branch.closed).contains(true);
         }
     }
 };
