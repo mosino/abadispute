@@ -34,7 +34,9 @@ module.exports = {
         let closedBranchExists = false;
 
         while (!closedBranchExists) {
-            branches = branchStepper(algorithmStep, branches);
+            branches = branchStepper(algorithmStep, branches).filter(
+                branch => !branch.last().get('aborted')
+            );
             closedBranchExists = branches.map(
                 branch => branch.last().get('closed')
             ).contains(true);
