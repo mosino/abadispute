@@ -6,8 +6,9 @@
 
 const rewire = require('rewire');
 const assert = require('assert');
-const { Map, Set, List } = require('immutable');
+const { Map, Set, List, fromJS } = require('immutable');
 const a = rewire('../abadispute.js');
+const fail = rewire('../fail.js');
 
 // const fCompute = a.__get__('fCompute');
 const fAlgorithmStep = a.__get__('fAlgorithmStep');
@@ -20,6 +21,7 @@ const fTConstructor = a.__get__('fTConstructor');
 const fGetInitialT = a.__get__('fGetInitialT');
 const fGetBranches = a.__get__('fGetBranches');
 const fGetDerivation = a.__get__('fGetDerivation');
+const branchStepper = fail.__get__('branchStepper');
 
 
 describe('Helpers', function () {
@@ -250,6 +252,30 @@ describe('Helpers', function () {
                 node6.delete('children'), 
                 node7.delete('children')
             ])));
+        });
+    });
+});
+
+describe('Fail', function () {
+    describe('#branchStepper', function () {
+        it('Should return a list of the new branches', function () {
+            let f = n => List([n + 1, n * 2]);
+            let branches = fromJS([[0, 1], [2, 3], [4, 5], [6, 7]]);
+            let newBranches = branchStepper(f, branches);
+            let expectedBranches = fromJS([
+                [0, 1, 2], 
+                [0, 1, 2], 
+                [2, 3, 4], 
+                [2, 3, 6],
+                [4, 5, 6],
+                [4, 5, 10],
+                [6, 7, 8],
+                [6, 7, 14],
+            ]);
+
+            console.log(newBranches);
+            console.log(expectedBranches);
+            assert.ok(newBranches.equals(expectedBranches));
         });
     });
 });
