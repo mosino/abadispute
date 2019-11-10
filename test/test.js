@@ -22,7 +22,6 @@ const fGetInitialT = a.__get__('fGetInitialT');
 const fGetBranches = a.__get__('fGetBranches');
 const fGetDerivation = a.__get__('fGetDerivation');
 const branchStepper = fail.__get__('branchStepper');
-const branchConstructor = fail.__get__('branchConstructor');
 
 
 describe('Helpers', function () {
@@ -261,26 +260,24 @@ describe('Fail', function () {
     describe('#branchStepper', function () {
         it('Should return a list of the new branches', function () {
             let f = n => List([n + 1, n * 2]);
-            let branches = List([
-                branchConstructor(false, false, List([0, 1])),
-                branchConstructor(false, false, List([2, 3])),
-                branchConstructor(false, false, List([4, 5])), 
-                branchConstructor(false, false, List([6, 7])),
+            let branches = fromJS([
+                [0, 1], 
+                [2, 3], 
+                [4, 5], 
+                [6, 7]
             ]);
             let newBranches = branchStepper(f, branches);
             let expectedBranches = fromJS([
-                branchConstructor(false, false, List([0, 1, 2])), 
-                branchConstructor(false, false, List([0, 1, 2])), 
-                branchConstructor(false, false, List([2, 3, 4])), 
-                branchConstructor(false, false, List([2, 3, 6])),
-                branchConstructor(false, false, List([4, 5, 6])),
-                branchConstructor(false, false, List([4, 5, 10])),
-                branchConstructor(false, false, List([6, 7, 8])),
-                branchConstructor(false, false, List([6, 7, 14])),
+                [0, 1, 2], 
+                [0, 1, 2], 
+                [2, 3, 4], 
+                [2, 3, 6],
+                [4, 5, 6],
+                [4, 5, 10],
+                [6, 7, 8],
+                [6, 7, 14],
             ]);
 
-            console.log(newBranches);
-            console.log(expectedBranches);
             assert.ok(newBranches.equals(expectedBranches));
         });
     });
