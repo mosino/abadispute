@@ -348,8 +348,8 @@ module.exports = {
         sel: (S) => S.last(null),
         turn: (P, O, F, recentPO) => {
             if (recentPO == 'P' && P.size != 0) return 'P';
-            if (recentPO == 'O' && O.size != 0) return 'P';
-            if (F.size != 0) return 'F'; // ?
+            if (recentPO == 'O' && O.size != 0) return 'O';
+            if (F.size != 0) return 'F';
 
             console.error('no valid turn');
             return null;
