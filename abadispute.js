@@ -32,7 +32,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
     let A = Set(fw.assumptions);
     let R = Set(fw.rules);
     let turn = i.turn(P, O, F, t.get('recentPO'));
-    // not::function - allow for functional or list of contraries
+    // not::function - allow for function or array of contraries
     let not = (typeof(fw.contraries) == 'function') ?
         fw.contraries :
         (a => fw.contraries[a]);
@@ -61,14 +61,14 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
         } else {    // 1.ii
             let ruleExists = false;
 
-            R.map(
+            R.forEach(
                 rule => {
                     if (rule.h == sigma) {
                         let body = Set(rule.b);
 
-                        ruleExists = true;
-
                         if (f.fDbyC(body, C)) {
+                            ruleExists = true;
+
                             let newP = P.delete(sigma).union(f.fDbyD(body, D));
 
                             let tChild = fTConstructor()
