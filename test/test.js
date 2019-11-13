@@ -1,6 +1,6 @@
 const rewire = require('rewire');
 const assert = require('assert');
-const { Map, Set, List, fromJS } = require('immutable');
+const { Map, Set, OrderedSet, List, fromJS } = require('immutable');
 const a = rewire('../abadispute.js');
 const fail = rewire('../fail.js');
 const helpers = rewire('../helpers.js');
@@ -27,7 +27,7 @@ describe('Helpers', function () {
 
             assert.ok(argument.equals(
                 Map({
-                    s: Set(['mySentence']),
+                    s: OrderedSet(['mySentence']),
                     m: Set()
                 }))
             );
@@ -37,7 +37,7 @@ describe('Helpers', function () {
     describe('#fDeleteFromArgument', function () {
         it('If marked, should remove "mySentence" from both "s" and "m"', function () {
             let argument = Map({
-                s: Set(['a', 'b', 'c', 'mySentence']),
+                s: OrderedSet(['a', 'b', 'c', 'mySentence']),
                 m: Set(['a', 'c', 'mySentence'])
             });
 
@@ -45,7 +45,7 @@ describe('Helpers', function () {
 
             assert.ok(argument.equals(
                 Map({
-                    s: Set(['a', 'b', 'c']),
+                    s: OrderedSet(['a', 'b', 'c']),
                     m: Set(['a', 'c'])
                 })
             ));

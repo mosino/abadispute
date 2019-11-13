@@ -1,4 +1,4 @@
-const { Map, Set, List } = require('immutable');
+const { Map, Set, OrderedSet, List } = require('immutable');
 
 const h = require('./helpers');
 const fail = require('./fail');
@@ -211,7 +211,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
 
 const fArgumentConstructor = sentence => 
     Map({
-        s: Set([sentence]),
+        s: OrderedSet([sentence]),
         m: Set()    // marked sentences
     });
 
@@ -226,7 +226,7 @@ const fMark = (argument, sentence) =>
 
 const fTConstructor = () =>
     Map({
-        P: Set(),
+        P: OrderedSet(),
         O: Set(),   // Set of Arguments
         D: Set(),
         C: Set(),
@@ -345,7 +345,6 @@ module.exports = {
     }, 
     
     implementationLP: {
-        // @todo S::orderedSet
         sel: (S) => S.last(null),
         turn: (P, O, F, recentPO) => {
             if (recentPO == 'P' && P.size != 0) return 'P';
