@@ -1,4 +1,4 @@
-const { Set, Map } = require('immutable');
+const { Set, Map, isMap } = require('immutable');
 
 const fDeleteFromArgument = (argument, sentence) =>
     Map({
@@ -9,6 +9,8 @@ const fDeleteFromArgument = (argument, sentence) =>
 const fArgumentAddSentences = (argument, sentences) =>
     argument.set('s', argument.get('s').union(sentences));
 
+const isArgument = a => Map.isMap(a) && a.has('s') && a.has('m');
+
 module.exports = {
     step2iiComputeO: (O, R, S, C, sigma, fCbyC) => {
         let newO = O.delete(S);
@@ -16,12 +18,18 @@ module.exports = {
         R.map(rule => {
             if (rule.h == sigma) {
                 if (!fCbyC(Set(rule.b), C)) {
-                    newO = newO.add(
-                        fArgumentAddSentences(
-                            fDeleteFromArgument(S, sigma),
-                            Set(rule.b)
+                    if (isArgument(S)) {
+                        newO = newO.add(
+                            fArgumentAddSentences(
+                                fDeleteFromArgument(S, sigma),
+                                Set(rule.b)
+                            )
+                        );
+                    } else {
+                        newO = newO.add(
+                            S.delete(sigma).union(rule.b)
                         )
-                    );
+                    }
                 }
             }
         });

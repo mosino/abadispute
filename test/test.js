@@ -1,20 +1,15 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable array-element-newline */
-/* eslint-disable no-undef */
-/* eslint-disable prefer-arrow-callback */
-/* eslint-disable func-names */
-
 const rewire = require('rewire');
 const assert = require('assert');
 const { Map, Set, List, fromJS } = require('immutable');
 const a = rewire('../abadispute.js');
 const fail = rewire('../fail.js');
+const helpers = rewire('../helpers.js');
 
 // const fCompute = a.__get__('fCompute');
 const fAlgorithmStep = a.__get__('fAlgorithmStep');
 const fArgumentConstructor = a.__get__('fArgumentConstructor');
-const fDeleteFromArgument = a.__get__('fDeleteFromArgument');
-const fArgumentAddSentences = a.__get__('fArgumentAddSentences');
+const fDeleteFromArgument = helpers.__get__('fDeleteFromArgument');
+const fArgumentAddSentences = helpers.__get__('fArgumentAddSentences');
 const fGetUnmarked = a.__get__('fGetUnmarked');
 const fMark = a.__get__('fMark');
 const fTConstructor = a.__get__('fTConstructor');
@@ -22,7 +17,8 @@ const fGetInitialT = a.__get__('fGetInitialT');
 const fGetBranches = a.__get__('fGetBranches');
 const fGetDerivation = a.__get__('fGetDerivation');
 const branchStepper = fail.__get__('branchStepper');
-
+const qConstructor = fail.__get__('qConstructor');
+const algorithmStepFactory = fail.__get__('algorithmStepFactory');
 
 describe('Helpers', function () {
     describe('#fArgumentConstructor', function () {
@@ -279,6 +275,61 @@ describe('Fail', function () {
             ]);
 
             assert.ok(newBranches.equals(expectedBranches));
+        });
+    });
+
+    describe('#algorithmStep', function () {
+        describe('o is empty (1.a)', function () {
+            it('Should remove "Q"', function() {
+                let fw = {
+                    assumptions: [],
+                    rules: []
+                }
+                let algorithmStep = algorithmStepFactory(fw, Set());
+                let Q0 = qConstructor(Set(), Set([Set()]), Set(), Set());
+                let D0 = Set([Q0]);
+                let D1s = algorithmStep(D0);
+                let D1sExpected = List([
+                   Set([])
+                ]);
+
+                assert.ok(D1s.equals(D1sExpected));
+            });
+        });
+    });
+
+    describe('#Fail(S)', function () {
+        it('Should find a derivation for the given input', function () {
+            let fw = {
+                rules: [
+                    {
+                        h: '-a',
+                        b: 'a'
+                    },
+                    {
+                        h: '-a',
+                        b: 'b'
+                    },
+                    {
+                        h: '-b',
+                        b: 'a'
+                    },
+                    {
+                        h: '-g',
+                        b: 'd'
+                    },
+                    {
+                        h: '-d',
+                        b: 'g'
+                    },
+                ],
+                assumptions: ['a', 'b', 'g', 'd'],
+                contraries: x => '-' + x
+            } 
+
+            let S = Set(['a']);
+
+            assert.ok(fail.fail(fw, S));
         });
     });
 });

@@ -1,6 +1,7 @@
 const { Map, Set, List } = require('immutable');
 
 const h = require('./helpers');
+const fail = require('./fail');
 
 // recursive call
 const fCompute = (filters, updt, implementation, framework, t) => n => {
@@ -180,7 +181,27 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
             t = t.set('children', t.get('children').push(tChild));
         }
     } else if (turn == 'F') {    // 3
-        // @todo
+        let F = i.memberF(F);
+
+        if (fail.fail(S)) {
+            let newF = F.delete(S);
+            let tChild = fTConstructor()       
+                .set('O', O)
+                .set('F', newF)
+                .set('P', P)
+                .set('D', D)
+                .set('C', C)
+                .set('recentPO', t.get('recentPO'))
+                .set('step', t.get('step') + 1)
+                .set('aborted', false)
+                .set('success', P.size == 0 && O.size == 0 && newF.size == 0)
+                .set('path', t.get('path').push(t.get('children').size))
+                .set('by', '3');
+            
+            t = t.set('children', t.get('children').push(tChild));
+        } else {
+            t = t.set('aborted', true);
+        }
     } else {
         console.error('"turn" returned an unexpected value');
     }
@@ -193,15 +214,6 @@ const fArgumentConstructor = sentence =>
         s: Set([sentence]),
         m: Set()    // marked sentences
     });
-
-const fDeleteFromArgument = (argument, sentence) =>
-    Map({
-        s: argument.get('s').delete(sentence),
-        m: argument.get('m').delete(sentence)
-    });
-
-const fArgumentAddSentences = (argument, sentences) =>
-    argument.set('s', argument.get('s').union(sentences));
 
 // S_u
 const fGetUnmarked = argument => argument.get('s').subtract(argument.get('m'));
