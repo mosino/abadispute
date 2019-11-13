@@ -44,7 +44,7 @@ const algorithmStepFactory = (fw, S) => D => {
                                 sigma => {
                                     if (!assumptions.contains(sigma)) {
                                         // 1.b.i
-                                        let filter = (R, C) => R.intersect(C).size != 0;
+                                        let filter = (R, C) => !R.intersect(C).isEmpty();
                                         let Qprime = Q.set('O', h.step2iiComputeO(O, rules, S, C, sigma, filter));
                                         let Dnext = D.delete(Q).add(Qprime);
 
@@ -118,7 +118,7 @@ const algorithmStepFactory = (fw, S) => D => {
 
                                         let R = Set(rule.b);
                 
-                                        if (R.intersect(C).size == 0) {
+                                        if (R.intersect(C).isEmpty()) {
                                             let Qprime = Q
                                                 .set('P', P.delete(sigma).union(R.subtract(A)))
                                                 .set('A', A.union(assumptions.intersect(R)))

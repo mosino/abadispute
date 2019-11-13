@@ -6,7 +6,7 @@ const fail = require('./fail');
 // recursive call
 const fCompute = (filters, updt, implementation, framework, t) => n => {
     if (n >= t.get('step')) {
-        if (t.get('children').size == 0) {
+        if (t.get('children').isEmpty()) {
             t = fAlgorithmStep(filters, updt, implementation, framework, t);
         }
         
@@ -54,7 +54,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('recentPO', 'O')
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
-                .set('success', newP.size == 0 && newO.size == 0 && F.size == 0)
+                .set('success', newP.isEmpty() && newO.isEmpty() && F.isEmpty())
                 .set('path', t.get('path').push(t.get('children').size))
                 .set('by', '1.i');
 
@@ -81,7 +81,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                                 .set('recentPO', 'P')
                                 .set('step', t.get('step') + 1)
                                 .set('aborted', false)
-                                .set('success', newP.size == 0 && O.size == 0 && F.size == 0)
+                                .set('success', newP.isEmpty() && O.isEmpty() && F.isEmpty())
                                 .set('path', t.get('path').push(t.get('children').size))
                                 .set('by', '1.ii');
 
@@ -114,7 +114,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('recentPO', 'O')
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
-                .set('success', P.size == 0 && newOA.size == 0 && F.size == 0)
+                .set('success', P.isEmpty() && newOA.isEmpty() && F.isEmpty())
                 .set('path', t.get('path').push(t.get('children').size))
                 .set('by', '2.i.a');
             
@@ -134,7 +134,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('recentPO', 'O')
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
-                        .set('success', P.size == 0 && newO.size == 0 && newF.size == 0)
+                        .set('success', P.isEmpty() && newO.isEmpty() && newF.isEmpty())
                         .set('path', t.get('path').push(t.get('children').size))
                         .set('by', '2.i.b');
                     
@@ -153,7 +153,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                         .set('recentPO', 'P')
                         .set('step', t.get('step') + 1)
                         .set('aborted', false)
-                        .set('success', newP.size == 0 && newO.size == 0 && newF.size == 0)
+                        .set('success', newP.isEmpty() && newO.isEmpty() && newF.isEmpty())
                         .set('path', t.get('path').push(t.get('children').size))
                         .set('by', '2.i.c');
                     
@@ -174,7 +174,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('recentPO', 'O')
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
-                .set('success', P.size == 0 && newO.size == 0 && newF.size == 0)
+                .set('success', P.isEmpty() && newO.isEmpty() && newF.isEmpty())
                 .set('path', t.get('path').push(t.get('children').size))
                 .set('by', '2.ii');
             
@@ -194,7 +194,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 .set('recentPO', t.get('recentPO'))
                 .set('step', t.get('step') + 1)
                 .set('aborted', false)
-                .set('success', P.size == 0 && O.size == 0 && newF.size == 0)
+                .set('success', P.isEmpty() && O.isEmpty() && newF.isEmpty())
                 .set('path', t.get('path').push(t.get('children').size))
                 .set('by', '3');
             
@@ -250,7 +250,7 @@ const fGetBranches = tList => {
 
     tList.map(
         t => {
-            if (t.get('children').size == 0) {
+            if (t.get('children').isEmpty()) {
                 branches = branches.push(t);
             } else {
                 branches = branches.concat(fGetBranches(t.get('children')));
@@ -263,7 +263,7 @@ const fGetBranches = tList => {
 
 // list of all tuples along path in the computation tree
 const fGetDerivation = (t, path, partialDerivation) =>
-    (path.size == 0) ?
+    (path.isEmpty()) ?
         partialDerivation.push(t.delete('children')) :
         fGetDerivation(
             t.getIn([
@@ -304,14 +304,14 @@ module.exports = {
     },
 
     filtersAB: {
-        fDbyC: (R, C) => R.intersect(C).size == 0,
+        fDbyC: (R, C) => R.intersect(C).isEmpty(),
         fDbyD: (R, D) => R.subtract(D),
         fCbyD: (s, D) => !D.contains(s),
-        fCbyC: (R, C) => R.intersect(C).size != 0
+        fCbyC: (R, C) => !R.intersect(C).isEmpty()
     },
     
     filtersGB: {
-        fDbyC: (R, C) => R.intersect(C).size == 0,
+        fDbyC: (R, C) => R.intersect(C).isEmpty(),
         fDbyD: (R, _D) => R,
         fCbyD: (s, D) => !D.contains(s),
         fCbyC: (_R, _C) => false
@@ -321,7 +321,7 @@ module.exports = {
         fDbyC: (R, C) => this.filtersAB(R, C),
         fDbyD: (R, D) => R.subtract(D),
         fCbyD: (s, D) => !D.contains(s),
-        fCbyC: (R, C) => R.intersect(C).size != 0
+        fCbyC: (R, C) => !R.intersect(C).isEmpty()
     },
     
     updtSimple: (F, _S) => F,
@@ -333,9 +333,9 @@ module.exports = {
     implementationSimple: {
         sel: (S) => S.first(null),
         turn: (P, O, F, _recentPO) => {
-            if (P.size != 0) return 'P';
-            if (O.size != 0) return 'O';
-            if (F.size != 0) return 'F';
+            if (P.isEmpty()) return 'P';
+            if (O.isEmpty()) return 'O';
+            if (F.isEmpty()) return 'F';
 
             console.error('no valid turn');
             return null;
@@ -347,9 +347,11 @@ module.exports = {
     implementationLP: {
         sel: (S) => S.last(null),
         turn: (P, O, F, recentPO) => {
-            if (recentPO == 'P' && P.size != 0) return 'P';
-            if (recentPO == 'O' && O.size != 0) return 'O';
-            if (F.size != 0) return 'F';
+            if (O.isEmpty() && !P.isEmpty()) return 'P';
+            if (P.isEmpty() && !O.isEmpty()) return 'O';
+            if (P.isEmpty() && O.isEmpty() && !F.isEmpty) return 'F'
+            if (recentPO == 'P' && !P.isEmpty()) return 'P';
+            if (recentPO == 'O' && !O.isEmpty()) return 'O';
 
             console.error('no valid turn');
             return null;
