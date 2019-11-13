@@ -123,7 +123,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
             if (f.fCbyD(sigma, D)) {
                 if (f.fCbyC(Set([sigma]), C)) {   // 2.i.b
                     let newO = O.delete(S);
-                    let newF = updt(F, S.get('s'));
+                    let newF = updt(F, Set([S.get('s')]));
 
                     let tChild = fTConstructor()
                         .set('O', newO)
@@ -142,7 +142,7 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
                 } else {    // 2.i.c
                     let newO = O.delete(S);
                     let newP = P.add(not(sigma));
-                    let newF = updt(F, S.get('s'));
+                    let newF = updt(F, Set([S.get('s')]));
 
                     let tChild = fTConstructor()
                         .set('O', newO)
@@ -181,9 +181,11 @@ const fAlgorithmStep = (f, updt, i, fw, t) => {
             t = t.set('children', t.get('children').push(tChild));
         }
     } else if (turn == 'F') {    // 3
-        let F = i.memberF(F);
+        let S = i.memberF(F);
 
-        if (fail.fail(S)) {
+        console.log({F, S});
+
+        if (fail.fail(fw, S)) {
             let newF = F.delete(S);
             let tChild = fTConstructor()       
                 .set('O', O)
@@ -318,7 +320,7 @@ module.exports = {
     },
     
     filtersIB: {
-        fDbyC: (R, C) => this.filtersAB(R, C),
+        fDbyC: (R, C) => R.intersect(C).isEmpty(),
         fDbyD: (R, D) => R.subtract(D),
         fCbyD: (s, D) => !D.contains(s),
         fCbyC: (R, C) => !R.intersect(C).isEmpty()
@@ -333,9 +335,9 @@ module.exports = {
     implementationSimple: {
         sel: (S) => S.first(null),
         turn: (P, O, F, _recentPO) => {
-            if (P.isEmpty()) return 'P';
-            if (O.isEmpty()) return 'O';
-            if (F.isEmpty()) return 'F';
+            if (!P.isEmpty()) return 'P';
+            if (!O.isEmpty()) return 'O';
+            if (!F.isEmpty()) return 'F';
 
             console.error('no valid turn');
             return null;
@@ -349,7 +351,7 @@ module.exports = {
         turn: (P, O, F, recentPO) => {
             if (O.isEmpty() && !P.isEmpty()) return 'P';
             if (P.isEmpty() && !O.isEmpty()) return 'O';
-            if (P.isEmpty() && O.isEmpty() && !F.isEmpty) return 'F'
+            if (P.isEmpty() && O.isEmpty() && !F.isEmpty()) return 'F'
             if (recentPO == 'P' && !P.isEmpty()) return 'P';
             if (recentPO == 'O' && !O.isEmpty()) return 'O';
 

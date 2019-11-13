@@ -9,7 +9,11 @@ const qConstructor = (P, O, A, C) =>
         O,
         A,
         C
-    }).set('aborted', false);
+    });
+
+// dConstructor: Qs: Q[] => {Qs: Q[], aborted: boolean}
+const dConstructor = (Qs) =>
+    Map({ Qs }).set('aborted', false);
 
 // algorithmStep: (d: D) => D[]
 const algorithmStepFactory = (fw, S) => D => {
@@ -20,14 +24,17 @@ const algorithmStepFactory = (fw, S) => D => {
         fw.contraries :
         (a => fw.contraries[a]);
 
-    D.forEach(
+    D.get('Qs').forEach(
         Q => {
             let P = Q.get('P');
             let O = Q.get('O');
             let A = Q.get('A');
             let C = Q.get('C');
 
-            if (P.isEmpty() && O.isEmpty()) return List([D.set('aborted', true)]);
+            if (P.isEmpty() && O.isEmpty()) {
+                let Dnext = D.set('aborted', true);
+                newDs = newDs.push(Dnext);
+            }
 
             if (!O.isEmpty()) {
                 // 1
@@ -35,7 +42,7 @@ const algorithmStepFactory = (fw, S) => D => {
                     o => {
                         if (o.isEmpty()) {
                             // 1.a
-                            let Dnext = D.delete(Q);
+                            let Dnext = D.set('Qs', D.get('Qs').delete(Q));
 
                             newDs = newDs.push(Dnext);
                         } else {
@@ -46,7 +53,7 @@ const algorithmStepFactory = (fw, S) => D => {
                                         // 1.b.i
                                         let filter = (R, C) => !R.intersect(C).isEmpty();
                                         let Qprime = Q.set('O', h.step2iiComputeO(O, rules, S, C, sigma, filter));
-                                        let Dnext = D.delete(Q).add(Qprime);
+                                        let Dnext = D.set('Qs', D.get('Qs').delete(Q).add(Qprime));
 
                                         let DnextJs = Dnext.toJS();
 
@@ -75,15 +82,13 @@ const algorithmStepFactory = (fw, S) => D => {
                                                 }
                                             }
 
-                                            let Dnext = D.delete(Q).add(Q0).add(Q1);
-
-                                            let DnextJs = Dnext.toJS();
+                                            let Dnext = D.set('Qs', D.get('Qs').delete(Q).add(Q0).add(Q1));
 
                                             newDs = newDs.push(Dnext);
                                         } else {
                                             // Case 2
                                             let Q0 = Q.set('O', O.delete(S).add(S.delete(sigma)));
-                                            let Dnext = D.delete(Q).add(Q0);
+                                            let Dnext = D.set('Qs', D.get('Qs').delete(Q).add(Q0));
 
                                             newDs = newDs.push(Dnext);
                                         }
@@ -104,7 +109,7 @@ const algorithmStepFactory = (fw, S) => D => {
                             let Qprime = Q
                                 .set('P', P.delete(sigma))
                                 .set('O', O.add(Set([not(sigma)])))
-                            let Dnext = D.delete(Q).add(Qprime);
+                            let Dnext = D.set('Qs', D.get('Qs').delete(Q).add(Qprime));
 
                             newDs = newDs.push(Dnext);
                         } else {
@@ -122,15 +127,18 @@ const algorithmStepFactory = (fw, S) => D => {
                                             let Qprime = Q
                                                 .set('P', P.delete(sigma).union(R.subtract(A)))
                                                 .set('A', A.union(assumptions.intersect(R)))
-                                            let Dnext = D.delete(Q).add(Qprime);
+                                            let Dnext = D.set('Qs', D.get('Qs').delete(Q).add(Qprime));
 
                                             newDs = newDs.push(Dnext);
                                         }
                                     }
                                 }
-                            )
+                            );
 
-                            if (!ruleExists) return List([D.set('aborted', true)]);
+                            if (!ruleExists) {
+                                let Dnext = D.set('aborted', true);
+                                newDs = newDs.push(Dnext);
+                            }
                         }
                     }
                 )
@@ -154,12 +162,11 @@ const branchStepper = (f, branches) =>
 module.exports = {
     fail: (fw, S) => {
         let Q0 = qConstructor(S, Set(), S.intersect(Set(fw.assumptions)), Set());
-        let D0 = Set([Q0]);
+        let D0 = dConstructor(Set([Q0]));
         let branch0 = List([D0]);
         let branches = List([branch0]);
         let closedBranchExists = false;
         let algorithmStep = algorithmStepFactory(fw, S);
-        let branchesJS = branches.toJS();
 
         while (!closedBranchExists && !branches.isEmpty()) {
             branches = branchStepper(algorithmStep, branches).filter(
@@ -167,9 +174,8 @@ module.exports = {
             );
             branchesJS = branches.toJS();
             closedBranchExists = branches.map(
-                branch => branch.last().isEmpty()
+                branch => branch.last().get('Qs').isEmpty()
             ).contains(true);
-
         }
 
         return closedBranchExists;

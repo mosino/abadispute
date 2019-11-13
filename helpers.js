@@ -41,17 +41,15 @@ module.exports = {
         let updateFWith = Set();
 
         R.map(rule => {
-            if (rule.h == sigma) {
-                if (fCbyC(Set(rule.b), C)) {
-                    updateFWith = updateFWith.union(
-                        S.get('s')
-                            .delete(sigma)
-                            .union(Set(rule.b))
-                    );
-                }
+            if (rule.h == sigma && fCbyC(Set(rule.b), C)) {
+                updateFWith = updateFWith.union(
+                    S.get('s')
+                        .delete(sigma)
+                        .union(Set(rule.b))
+                );
             }
         });
 
-        return updateFWith;
+        return Set(updateFWith);
     }
 };

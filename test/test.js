@@ -18,6 +18,7 @@ const fGetBranches = a.__get__('fGetBranches');
 const fGetDerivation = a.__get__('fGetDerivation');
 const branchStepper = fail.__get__('branchStepper');
 const qConstructor = fail.__get__('qConstructor');
+const dConstructor = fail.__get__('dConstructor');
 const algorithmStepFactory = fail.__get__('algorithmStepFactory');
 
 describe('Helpers', function () {
@@ -279,7 +280,35 @@ describe('Fail', function () {
     });
 
     describe('#algorithmStep', function () {
-        describe('o is empty (1.a)', function () {
+        describe('O and P empty', function () {
+            it('Should abort the branch', function () {
+                let fw = {
+                    assumptions: [],
+                    rules: []
+                }
+                let algorithmStep = algorithmStepFactory(fw, Set());
+                let Q0 = qConstructor(Set(), Set(), Set(['a']), Set(['b']));
+                let D0 = dConstructor(Set([Q0]));
+                let D1s = algorithmStep(D0);
+                let D1sExpected = List([
+                    Map({
+                         Qs: Set([
+                             Map({
+                                 P: Set(),
+                                 O: Set(),
+                                 A: Set(['a']),
+                                 C: Set(['b'])
+                             }),
+                         ]),
+                         aborted: true
+                    })
+                ]);
+
+                assert.ok(D1s.equals(D1sExpected));
+            });
+        }),
+
+        describe('O selected, o is empty (1.a)', function () {
             it('Should remove "Q"', function() {
                 let fw = {
                     assumptions: [],
@@ -287,10 +316,47 @@ describe('Fail', function () {
                 }
                 let algorithmStep = algorithmStepFactory(fw, Set());
                 let Q0 = qConstructor(Set(), Set([Set()]), Set(), Set());
-                let D0 = Set([Q0]);
+                let D0 = dConstructor(Set([Q0]));
                 let D1s = algorithmStep(D0);
                 let D1sExpected = List([
-                   Set([])
+                   Map({
+                       Qs: Set([]),
+                       aborted: false
+                   })
+                ]);
+
+                assert.ok(D1s.equals(D1sExpected));
+            });
+        });
+
+        describe('P selected, sigma not in assumptions', function () {
+            it('Should abort the branch, if no rules are applicable', function () {
+                let fw = {
+                    rules: [
+                        {
+                            h: 'a',
+                            b: 'b'
+                        },
+                    ],
+                    assumptions: ['a'],
+                    contraries: x => '-' + x
+                }
+                let algorithmStep = algorithmStepFactory(fw, Set());
+                let Q0 = qConstructor(Set(['b']), Set(), Set(['d']), Set());
+                let D0 = dConstructor(Set([Q0]));
+                let D1s = algorithmStep(D0);
+                let D1sExpected = List([
+                   Map({
+                        Qs: Set([
+                            Map({
+                                P: Set(['b']),
+                                O: Set(),
+                                A: Set(['d']),
+                                C: Set()
+                            }),
+                        ]),
+                        aborted: true
+                   })
                 ]);
 
                 assert.ok(D1s.equals(D1sExpected));
@@ -554,7 +620,7 @@ describe('Algorithm', function () {
 
                             let newChildExpected = fTConstructor()
                                 .set('O', Set([argA, argB]))
-                                .set('F', Set(['c', 'd']))
+                                .set('F', Set([OrderedSet(['c', 'd'])]))
                                 .set('step', 4)
                                 .set('recentPO', 'O')
                                 .set('path', List([1]))
@@ -604,7 +670,7 @@ describe('Algorithm', function () {
                                 .set('O', Set([argA, argB]))
                                 .set('C', Set(['x', 'c']))
                                 .set('D', Set(['y', 'notc']))
-                                .set('F', Set(['c', 'd']))
+                                .set('F', Set([OrderedSet(['c', 'd'])]))
                                 .set('P', Set(['z', 'notc']))
                                 .set('step', 4)
                                 .set('recentPO', 'P')
