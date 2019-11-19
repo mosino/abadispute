@@ -1,18 +1,42 @@
 # ABAdispute
 
+Note: a graphical user interface to play around with ABA frameworks based on this library can be found here: <http://moritzsinowatz-abagui.s3-website.eu-central-1.amazonaws.com/>
+
 ## Introduction
 
-ABAdispute is a JavaScript implementation of the X-dispute derivation as described by Francesca Toni in [1], and is therefore a library suited to evaluate ABA-Frameworks as first introduced in [2] by Phan Minh Dung et al.
+Assumption-Based Argumentation is a framework that was introduced in the 90s by P. M. Dung et. al. as a framework to generalize different approaches to default reasoning \[1\].
 
-The implementation, including variable and function names, follows the description in [1] closely, to facilitate easier correspondence.
+What is default reasoning? In classical, monotonic logics, if something can be prooven, that means it stays true forever, even if new information is gathered. Consider the following example: We know, that all prime numbers greater than two are odd. We have the information, that `x` is a prime number, and that it is greater than two. Now we can derive, that `x` must be odd. Even if we get new information (e.g. that `x` is a positive integer smaller than 10), this won't change anything about the fact, that it must be an odd number.
+
+However, this does not always reflect how humans reason. For example, you might hear a story about a person (Anna) buying ice cream for all the children. Everybody knows (or to be more exact, assumes), that all children love ice cream, so you will come to the conclusion that all the children were happily eating ice cream. But now Anna tells you that there is one odd kid in the group who absolutely hates ice cream. You will then, based on that new information, have to revert that conclusion and conclude instead, that there was at least one child who was not so happy. This is where non-monotonic reasoning comes into play, providing mechanisms to reflect this kind of reasoning.
+
+Assumption-Based Argumentation, as a generalizing framework, does not rely on any specific (logical) language, and provides a means of modelling different kinds of default logics.
+
+## Assumption-Based Argumentation (ABA)
+An ABA framework consists of four parts and is written as a touple `<L,R,A,‾>`, where `L` represents the language, `R` a set of rules, `A` a set of assumptions and `‾` a mapping of each assumption to their contrary [3], [4].
+
+The set `R` consists of rules in the form `h ← b1,...,bn`, where `h` and `bi` represent sentences of the specified language. The intended meaning of a rule is, that if all `bi` can reasonably be assumed, we should then conclude `h`. The body of a rule can be empty, i.e. the rule looks like `h ←`. In this case, we speak of a fact.
+
+Assumptions `A` represent sentences, that are assumed to be true, however, we can later decide that they are not true after all. Contraries are the sentences that are in conflict with the given assumption, i.e. an assumption and its contrary cannot be true at the same time.
+
+## X-Dispute Derivation
+
+X-Dispute Derivations were introduced in 2011 by F. Toni as a generalized algorithm to solve the derivability of a sentence in a given ABA framework under certain semantics [3], [2]. For more information about these semantics and the concrete implementation of X-Dispute Derivations please refer to [3], [2] and [4].
+
+ABAdispute is a JavaScript implementation of the X-dispute derivation.
+
+The implementation, including variable and function names, follows the description in [3] closely, to facilitate easier correspondence.
 
 ## Usage
 
 ### Import the library
 
+If the abadispute folder is placed in the root of your project
+
 ```javascript
-const { abadispute, filtersAB, filtersGB, filtersIB, updtSimple, updtIB, implementationSimple, implementationLP } = require('abadispute.js');
+const { abadispute, filtersAB, filtersGB, filtersIB, updtSimple, updtIB, implementationSimple, implementationLP } = require('./abadispute/abadispute.js');
 ```
+
 ### Set up a basic ABA-Framework
 
 A framework is an Object that has to conain `rules`, `assumptions` and `contraries`. Rules and assumptions have to be arrays, contraries can be either an object or a function.
@@ -76,7 +100,7 @@ As is the case with contraries as objects, it is expected that contraries as a f
 var instanceAB = abadispute(filtersAB, updtSimple, implementationSimple);
 var disputeABinstance = instanceAB(myAbaFramework, sentenceToCheck);
 ```
-This is an example of a simple AB instantiation, with filters for AB derivations a simple canonical implementation of the choice parameters. Filters, the `updt`-function and the implementation can be mixed and matched freely.
+This is an example of a simple AB instantiation, with filters for AB derivations and a simple canonical implementation of the choice parameters. Filters, the `updt`-function and the implementation can be mixed and matched freely.
 
 #### Custom implementation (optional)
 
@@ -101,7 +125,7 @@ var myImplementation: {
     memberF: function (SS) { ... }  // any canonical implementation of memberF, returns String
 };
 ```
-Note that in order to define a custom implementation, immutable.js has to be imported. `R`, `C`, `D`, `F`, `S`, `P` and `SS` are Immutable Sets, `s` is a string (sentence), and `recentPO` is a marker that shows if 'P' or 'O' were the last Sets that had been modified.
+Note that in order to define a custom implementation, immutable.js has to be imported. `R`, `C`, `D`, `F`, `S`, `P` and `SS` are Immutable Sets, `s` is a string (sentence), and `recentPO` is a marker that shows if `P` or `O` were the last Sets that had been modified.
 
 Then the dispute can be instantiated with
 
@@ -148,13 +172,22 @@ var support = dispute1ABinstance.getSupport(2);
 
 ## Examples
 
-Please refer to the files showcaseN.js in the root of the project for complete working examples. The showcase files can be tested with node, e.g. (in the root of the project):
+Please refer to the files **showcase1.js** to **showcase4.js** in the root of the project for complete working examples. The showcase files can be tested with node, e.g. (in the root of the project):
 
 ```bash
 node showcase1.js
 ```
 
+(Note: don't forget to initialize the project with `npm install` first)
+
 ## References
 
-[1] _Toni, F. (2013). A generalised framework for dispute derivations in assumption-based argumentation. Artificial Intelligence, 195, 1-43._
-[2] _Bondarenko, A., Dung, P. M., Kowalski, R. A., & Toni, F. (1997). An abstract, argumentation-theoretic approach to default reasoning. Artificial intelligence, 93(1-2), 63-101._
+[1] [A. Bondarenko, P. Dung, R. Kowalski, F. Toni (1997). An abstract, argumentation-theoretic approach to default reasoning, Artificial Intelligence 93 (1–2), 63–101.](https://www.sciencedirect.com/science/article/pii/S0004370297000155)
+
+[2] [P. M. Dung, P. Mancarella, F. Toni (2007). Computing ideal sceptical argumentation. Artificial Intelligence, 171 (10-15), 642-674.](https://www.sciencedirect.com/science/article/pii/S000437020700080X)
+
+[3] [F. Toni (2013). A generalised framework for dispute derivations in assumption-based argumentation. Artificial Intelligence 195, 1-43.](https://www.sciencedirect.com/science/article/pii/S0004370212001233)
+
+[4] [K. Čyras, X. Fan, C. Schulz, F. Toni (2017). Assumption-based argumentation: disputes, explanations, preferences. J. Appl. Logics-IfCoLoG J. Logics Appl, 4(8), 2407-2456.](https://pdfs.semanticscholar.org/7da8/fb9d0e6e3ee414875362b24be9453e905773.pdf#page=320)
+                    
+                
