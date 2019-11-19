@@ -125,7 +125,9 @@ var myImplementation: {
     memberF: function (SS) { ... }  // any canonical implementation of memberF, returns String
 };
 ```
-Note that in order to define a custom implementation, immutable.js has to be imported. `R`, `C`, `D`, `F`, `S`, `P` and `SS` are Immutable Sets, `s` is a string (sentence), and `recentPO` is a marker that shows if `P` or `O` were the last Sets that had been modified.
+Note that in order to define a custom implementation, immutable.js has to be imported. `R`, `C`, `D`, `F`, `S` and `SS` are Immutable Sets, `P` is an Immutable OrderedSet, `s` is a string (sentence), and `recentPO` is a marker that shows if `P` or `O` were the last Sets that had been modified.
+
+`O` is a set of `Argument`s, where each `Argument` is an Immutable Map with members `s` (Immutable OrderedSet) representing (all) the sentences, and `m` (Immutable Set) representing the marked sentences of that argument.
 
 Then the dispute can be instantiated with
 
